@@ -116,7 +116,7 @@ public class DisplayableBinaryTree extends JComponent {
 		this.frame = new JFrame();
 		this.frame.setFocusable(true);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.frame.setMinimumSize(new Dimension(this.tree.slowSize() * 20 + 18, this.tree.slowHeight() * 20 + 45));
+		this.frame.setMinimumSize(new Dimension(this.tree.size() * 20 + 18, this.tree.height() * 20 + 45));
 		this.frame.setSize(new Dimension(this.width, this.height));
 		// set the background color to a stormy gray
 		this.frame.getContentPane().setBackground(BACKGROUND_COLOR);
@@ -151,8 +151,8 @@ public class DisplayableBinaryTree extends JComponent {
 		this.width = this.frame.getWidth() - 18; // adjust for margins
 		this.height = this.frame.getHeight() - 45; // adjust for the margins
 
-		int treeHeight = this.tree.slowHeight();
-		int treeSize = this.tree.slowSize();
+		int treeHeight = this.tree.height();
+		int treeSize = this.tree.size();
 		if (treeSize < 1) {
 			return;
 		}
@@ -208,7 +208,7 @@ public class DisplayableBinaryTree extends JComponent {
 		g2.fill(new Rectangle2D.Double(this.width - 20, 80, 40, 5));
 		g2.fill(new Rectangle2D.Double(this.width - 25, 90, 50, 5));
 		// // RAISE THE BAR ^^^^^
-		DisplayableNodeWrapper current = this.tree.getRoot().getDisplayableNodePart();
+		DisplayableNodeWrapper current = new DisplayableNodeWrapper(this.tree.getRoot());
 		// CURRENT.POINT = THE CENTER POINT, NOT THE UPPER LEFT CORNER
 		this.paintHelper(g2, current, this.nodeY);
 		this.lineHelper(g2, current);
@@ -223,7 +223,7 @@ public class DisplayableBinaryTree extends JComponent {
 	 * @param nodeY
 	 */
 	private void paintHelper(Graphics2D g2, DisplayableNodeWrapper current, double nodeY) {
-		if (current.getNode().hasLeft()) {
+		if (current.hasLeft()) {
 			this.paintHelper(g2, current.getLeft(), nodeY + this.yDistance); // recurse
 		}
 		// set up the node
@@ -231,7 +231,7 @@ public class DisplayableBinaryTree extends JComponent {
 		current.setCircleRadius(this.circleRadius);
 		current.displayNode(g2); // display the node by passing the graphics2D
 		this.nodeX += this.xDistance;
-		if (current.getNode().hasRight()) {
+		if (current.hasRight()) {
 			this.paintHelper(g2, current.getRight(), nodeY + this.yDistance); // recurse
 		}
 	}
@@ -243,7 +243,7 @@ public class DisplayableBinaryTree extends JComponent {
 	 */
 	private void lineHelper(Graphics2D g2, DisplayableNodeWrapper current) {
 		if (hasParents) {
-			if (current.getNode().hasParent()) {
+			if (current.hasParent()) {
 				this.drawParentArrow(g2, current);
 			}
 		}
@@ -290,8 +290,7 @@ public class DisplayableBinaryTree extends JComponent {
 		g2.translate(0, this.circleRadius);
 		double arrowLength = start.distance(end) - 2 * this.circleRadius; // distance is from edge to edge
 		double arrowLengthSqrt = Math.sqrt(arrowLength); // scales better with the sqrt
-		Node dataNode = node.getNode();
-		if (dataNode == dataNode.getParent().getLeft() || dataNode == dataNode.getParent().getRight()) {
+		if (node.hasParent()) {
 			Line2D.Double line = new Line2D.Double(0, 0, 0, arrowLength - arrowLengthSqrt * 2);
 			g2.draw(line);
 		}
