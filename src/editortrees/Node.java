@@ -534,6 +534,7 @@ public class Node {
 			a.glue = element;
 			return left;
 		}
+		size--;
 		right = right.deleteBiggest(a);
 		// balance the tree
 		if (a.edited) {
