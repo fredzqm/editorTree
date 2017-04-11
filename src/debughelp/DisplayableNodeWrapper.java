@@ -5,7 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 
+import editortrees.EditTree;
 import editortrees.Node;
 
 /*
@@ -23,16 +25,19 @@ public class DisplayableNodeWrapper {
 	private static Color TEXT_COLOR = new Color(0x66FFB2);
 	private Point.Double point;
 	private double radius;
-	private Node node;
 
 	// ******************************************************************************
+
+	private EditTree tree;
+	private Node node;
 
 	/**
 	 * only sets the graphical related fields
 	 * 
 	 * @param node
 	 */
-	public DisplayableNodeWrapper(Node node) {
+	public DisplayableNodeWrapper(EditTree tree, Node node) {
+		this.tree = tree;
 		this.point = null;
 		this.radius = -10;
 		this.node = node;
@@ -40,11 +45,12 @@ public class DisplayableNodeWrapper {
 
 	/**
 	 * gets the displayable part of the left child
+	 * 
 	 * @return
 	 */
 	public DisplayableNodeWrapper getLeft() {
 		if (this.node.getLeft() != Node.NULL_NODE) {
-			return new DisplayableNodeWrapper(node.getLeft());
+			return new DisplayableNodeWrapper(tree, node.getLeft());
 		}
 		return null;
 	}
@@ -56,7 +62,7 @@ public class DisplayableNodeWrapper {
 	 */
 	public DisplayableNodeWrapper getRight() {
 		if (this.node.getRight() != Node.NULL_NODE) {
-			return new DisplayableNodeWrapper(node.getRight());
+			return new DisplayableNodeWrapper(tree, node.getRight());
 		}
 		return null;
 	}
@@ -67,8 +73,15 @@ public class DisplayableNodeWrapper {
 	 * @return
 	 */
 	public DisplayableNodeWrapper getParent() {
+		Iterator<Node> itr = tree.nodeIterator();
+		while (itr.hasNext()) {
+			Node n = itr.next();
+			if (n.getLeft() == this.node)
+				return new DisplayableNodeWrapper(tree, n);
+			if (n.getRight() == this.node)
+				return new DisplayableNodeWrapper(tree, n);
+		}
 		return null;
-//		return this.node.getParent().getDisplayableNodePart();
 	}
 
 	public Node getNode() {
@@ -184,15 +197,15 @@ public class DisplayableNodeWrapper {
 	}
 
 	public boolean hasParent() {
-		return false;
+		return getParent() != null;
 	}
 
 	public boolean hasLeft() {
-		return false;
+		return getLeft() != null;
 	}
 
 	public boolean hasRight() {
-		return false;
+		return getRight() != null;
 	}
 
 }

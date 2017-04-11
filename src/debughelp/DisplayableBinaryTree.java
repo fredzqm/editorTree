@@ -41,7 +41,8 @@ import editortrees.Node;
  */
 
 /**
- * A wrapper class for binary trees that can display the wrapped tree in a window.
+ * A wrapper class for binary trees that can display the wrapped tree in a
+ * window.
  * 
  * @author Philip Ross, 2014.
  */
@@ -51,15 +52,20 @@ public class DisplayableBinaryTree extends JComponent {
 	// do you have parent nodes?
 	public static boolean hasParents = false;
 
-	// a stormy gray background to be easy on the eyes at night, and set a stormy mood.
+	// a stormy gray background to be easy on the eyes at night, and set a
+	// stormy mood.
 	private static final Color BACKGROUND_COLOR = Color.DARK_GRAY;
 	// a light blue color, keeping in line with the stormy color scheme
 	private static final Color FOWARD_ARROW_COLOR = new Color(0x3399FF);
 	private static final Color PARENT_ARROW_COLOR = new Color(0x77619A);
-	private static final String FONT_NAME = "Comic Sans MS"; // comics sans for the win
-//	 private static final String FONT_NAME = "ESSTIXFifteen"; // change if you don't want to make it look cool
-	// private static final String FONT_NAME = "ESSTIXThirteen"; // change if you don't want to make it look cool
-//	 private static final String FONT_NAME = "Jokerman"; // change if you don't want to make it look cool
+	private static final String FONT_NAME = "Comic Sans MS"; // comics sans for
+																// the win
+	// private static final String FONT_NAME = "ESSTIXFifteen"; // change if you
+	// don't want to make it look cool
+	// private static final String FONT_NAME = "ESSTIXThirteen"; // change if
+	// you don't want to make it look cool
+	// private static final String FONT_NAME = "Jokerman"; // change if you
+	// don't want to make it look cool
 
 	private int width;
 	private int height;
@@ -74,7 +80,8 @@ public class DisplayableBinaryTree extends JComponent {
 	private boolean goingCrazy;
 
 	/**
-	 * Constructs a new displayable binary tree, set to default to the given window size for display..
+	 * Constructs a new displayable binary tree, set to default to the given
+	 * window size for display..
 	 * 
 	 * @param tree
 	 * @param windowWidth
@@ -157,8 +164,10 @@ public class DisplayableBinaryTree extends JComponent {
 			return;
 		}
 
-		this.xDistance = this.width / ((double) (treeSize)); // make the constant
-		this.circleRadius = this.xDistance / 2.0; // sets the circle diameter to the delta x distance
+		this.xDistance = this.width / ((double) (treeSize)); // make the
+																// constant
+		this.circleRadius = this.xDistance / 2.0; // sets the circle diameter to
+													// the delta x distance
 		Dimension minSize = new Dimension((int) (treeSize * 20 + 18), (int) (treeHeight * 30 + 45));
 		if (minSize.getHeight() > 1080) {
 			minSize.setSize(minSize.getWidth(), 1080);
@@ -172,11 +181,13 @@ public class DisplayableBinaryTree extends JComponent {
 		this.circleRadius *= 1.25;
 		if (this.goingCrazy) {
 			this.angle += 0.0001;
-			// fun feature to see if students notice that the circles are changing size
+			// fun feature to see if students notice that the circles are
+			// changing size
 			this.circleRadius += 10 * Math.sin(3 * this.angle) + 2 * Math.cos(15 * this.angle);
 		}
 		this.xDistance = (this.width - this.circleRadius * 2) / ((double) (treeSize - 1));
-		// calculates the delta y distance by equally dividing up the height minus the circle diameter
+		// calculates the delta y distance by equally dividing up the height
+		// minus the circle diameter
 		this.yDistance = (this.height - 2 * circleRadius) / ((double) (treeHeight));
 
 		// start at the upper left corner
@@ -208,7 +219,7 @@ public class DisplayableBinaryTree extends JComponent {
 		g2.fill(new Rectangle2D.Double(this.width - 20, 80, 40, 5));
 		g2.fill(new Rectangle2D.Double(this.width - 25, 90, 50, 5));
 		// // RAISE THE BAR ^^^^^
-		DisplayableNodeWrapper current = new DisplayableNodeWrapper(this.tree.getRoot());
+		DisplayableNodeWrapper current = new DisplayableNodeWrapper(this.tree, this.tree.getRoot());
 		// CURRENT.POINT = THE CENTER POINT, NOT THE UPPER LEFT CORNER
 		this.paintHelper(g2, current, this.nodeY);
 		this.lineHelper(g2, current);
@@ -276,7 +287,8 @@ public class DisplayableBinaryTree extends JComponent {
 		Point2D.Double end = node.getParent().getPoint();
 		g2.setColor(PARENT_ARROW_COLOR);
 		double SIZE_MULTIPLIER = 1.5;
-		AffineTransform transform = g2.getTransform(); // save graphics state to restore later
+		AffineTransform transform = g2.getTransform(); // save graphics state to
+														// restore later
 		double angle = 0;
 		try {
 			angle = Math.atan2(end.getY() - start.getY(), end.getX() - start.getX());
@@ -284,12 +296,19 @@ public class DisplayableBinaryTree extends JComponent {
 			// eh, this probability doesn't matter that much
 			return;
 		}
-		g2.translate(end.getX(), end.getY()); // move the center of the child node
+		g2.translate(end.getX(), end.getY()); // move the center of the child
+												// node
 		g2.rotate(angle + Math.PI / 2.0); // rotate
 		// move the edge of the circle
 		g2.translate(0, this.circleRadius);
-		double arrowLength = start.distance(end) - 2 * this.circleRadius; // distance is from edge to edge
-		double arrowLengthSqrt = Math.sqrt(arrowLength); // scales better with the sqrt
+		double arrowLength = start.distance(end) - 2 * this.circleRadius; // distance
+																			// is
+																			// from
+																			// edge
+																			// to
+																			// edge
+		double arrowLengthSqrt = Math.sqrt(arrowLength); // scales better with
+															// the sqrt
 		if (node.hasParent()) {
 			Line2D.Double line = new Line2D.Double(0, 0, 0, arrowLength - arrowLengthSqrt * 2);
 			g2.draw(line);
@@ -318,7 +337,8 @@ public class DisplayableBinaryTree extends JComponent {
 	 */
 	private void drawFowardArrow(Graphics2D g2, Point2D.Double start, Point2D.Double end) {
 		g2.setColor(FOWARD_ARROW_COLOR);
-		AffineTransform transform = g2.getTransform(); // save graphics state to restore later
+		AffineTransform transform = g2.getTransform(); // save graphics state to
+														// restore later
 		// get the correct rotation angle
 		if (end == null || start == null) {
 			System.out.println("NULL ANGLE");
@@ -330,15 +350,22 @@ public class DisplayableBinaryTree extends JComponent {
 			// silently ignore, cause you know, YOLO
 			return;
 		}
-		g2.translate(end.getX(), end.getY()); // move the center of the child node
+		g2.translate(end.getX(), end.getY()); // move the center of the child
+												// node
 		g2.rotate(angle + Math.PI / 2.0); // rotate
 		g2.translate(0, this.circleRadius); // move the edge of the circle
-		double arrowLength = start.distance(end) - 2 * this.circleRadius; // distance is from edge to edge
+		double arrowLength = start.distance(end) - 2 * this.circleRadius; // distance
+																			// is
+																			// from
+																			// edge
+																			// to
+																			// edge
 		Line2D.Double line = new Line2D.Double(0, 0, 0, arrowLength);
 		g2.draw(line);
 
 		Path2D.Double arrowHead = new Path2D.Double(); // paths are cool
-		double arrowLengthSqrt = Math.sqrt(arrowLength); // scales better with the sqrt
+		double arrowLengthSqrt = Math.sqrt(arrowLength); // scales better with
+															// the sqrt
 		// draws the arrow head
 		arrowHead.moveTo(0, 0);
 		arrowHead.lineTo(-arrowLengthSqrt, arrowLengthSqrt * 2);
@@ -350,7 +377,8 @@ public class DisplayableBinaryTree extends JComponent {
 	}
 
 	/**
-	 * returns a string that gives the given time difference in easily read time units
+	 * returns a string that gives the given time difference in easily read time
+	 * units
 	 * 
 	 * @param time
 	 * @return
@@ -382,5 +410,10 @@ public class DisplayableBinaryTree extends JComponent {
 				}
 			}
 		}
+	}
+
+	public static void show(EditTree tree) {
+		DisplayableBinaryTree x = new DisplayableBinaryTree(tree, 960, 1080, true);
+		x.show();
 	}
 }
