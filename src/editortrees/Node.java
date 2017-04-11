@@ -101,7 +101,7 @@ public class Node {
 	public Node constructFromTree() {
 		if (this == NULL_NODE)
 			return NULL_NODE;
-		return new Node(getElement(), left.constructFromTree(), right.constructFromTree(), balance);
+		return new Node(getElement(), left.constructFromTree(), right.constructFromTree(), getBalance());
 	}
 
 	@Override
@@ -114,11 +114,20 @@ public class Node {
 	public String toDebugString() {
 		if (this == NULL_NODE)
 			return "";
-		return "" + getElement() + getRank() + balance + ", " + left.toDebugString() + right.toDebugString();
+		return "" + getElement() + getRank() + getBalance() + ", " + left.toDebugString() + right.toDebugString();
 	}
 
 	public Code getBalance() {
 		return balance;
+	}
+
+	private Node updateBalanceCode(Code leftCode, Code thisCode, Code rightCode) {
+		if (leftCode != null)
+			left.balance = leftCode;
+		this.balance = thisCode;
+		if (rightCode != null)
+			right.balance = rightCode;
+		return this;
 	}
 
 	public char getElement() {
@@ -136,7 +145,7 @@ public class Node {
 	public int height() {
 		if (this == NULL_NODE)
 			return -1;
-		if (balance == Code.RIGHT)
+		if (getBalance() == Code.RIGHT)
 			return left.height() + 2;
 		return left.height() + 1;
 	}
@@ -268,13 +277,13 @@ public class Node {
 		}
 		if (a.treeBalanced)
 			return this;
-		if (balance == Code.SAME) {
+		if (getBalance() == Code.SAME) {
 			// keep searching unbalanced node
-			balance = from;
-		} else if (balance != from) {
+			return updateBalanceCode(null, from, null);
+		} else if (getBalance() != from) {
 			// finish searching unbalanced node
 			a.treeBalanced = true;
-			balance = Code.SAME;
+			return updateBalanceCode(null, Code.SAME, null);
 		} else {
 			// fixed unbalanced node
 			if (from == Code.LEFT) {
@@ -282,8 +291,8 @@ public class Node {
 			} else if (from == Code.RIGHT) {
 				return addRotateFromRight(a);
 			}
+			throw new RuntimeException();
 		}
-		return this;
 	}
 
 	/**
@@ -297,11 +306,8 @@ public class Node {
 	 */
 	private Node addRotateFromLeft(H a) {
 		a.treeBalanced = true;
-		if (left.balance == Code.LEFT) {
-			Node t = singleRightRotate(a);
-			t.balance = Code.SAME;
-			t.right.balance = Code.SAME;
-			return t;
+		if (left.getBalance() == Code.LEFT) {
+			return singleRightRotate(a).updateBalanceCode(null, Code.SAME, Code.SAME);
 		}
 		return doubleRightRotate(a);
 	}
@@ -317,43 +323,35 @@ public class Node {
 	 */
 	private Node addRotateFromRight(H a) {
 		a.treeBalanced = true;
-		if (right.balance == Code.RIGHT) {
-			// do single left rotate
-			Node t = singleLeftRotate(a);
-			t.balance = Code.SAME;
-			t.left.balance = Code.SAME;
-			return t;
+		if (right.getBalance() == Code.RIGHT) {
+			return singleLeftRotate(a).updateBalanceCode(Code.SAME, Code.SAME, null);
 		}
 		return doubleLeftRotate(a);
 	}
 
 	private Node doubleRightRotate(H a) {
-		// do double right rotate
 		left = left.singleLeftRotate(a);
-		// three cases for double rotation, set balance codes for each case
 		return singleRightRotate(a).updateDoubleRotationCode();
 	}
 
 	private Node doubleLeftRotate(H a) {
-		// do double left rotate
 		right = right.singleRightRotate(a);
-		// three cases for double rotation, set balance codes for each case
 		return singleLeftRotate(a).updateDoubleRotationCode();
 	}
 
+	/**
+	 * three cases for double rotation, set balance codes for each case
+	 * 
+	 * @return
+	 */
 	private Node updateDoubleRotationCode() {
-		if (balance == Code.RIGHT) {
-			left.balance = Code.LEFT;
-			right.balance = Code.SAME;
-		} else if (balance == Code.LEFT) {
-			left.balance = Code.SAME;
-			right.balance = Code.RIGHT;
+		if (getBalance() == Code.RIGHT) {
+			return updateBalanceCode(Code.LEFT, Code.SAME, Code.SAME);
+		} else if (getBalance() == Code.LEFT) {
+			return updateBalanceCode(Code.SAME, Code.SAME, Code.RIGHT);
 		} else {
-			left.balance = Code.SAME;
-			right.balance = Code.SAME;
+			return updateBalanceCode(Code.SAME, Code.SAME, Code.SAME);
 		}
-		balance = Code.SAME;
-		return this;
 	}
 
 	/**
@@ -424,26 +422,27 @@ public class Node {
 			if (a.treeBalanced)
 				return this;
 			return deleteFromLeft(a);
-		}
-		if (getRank() < pos) {
-			right = right.delete(pos - getRank() - 1, a);
 		} else {
-			a.deleted = getElement();
-			if (left == NULL_NODE && right == NULL_NODE) {
-				return NULL_NODE;
-			} else if (left == NULL_NODE) {
-				return right;
-			} else if (right == NULL_NODE) {
-				return left;
+			if (getRank() < pos) {
+				right = right.delete(pos - getRank() - 1, a);
+			} else {
+				a.deleted = getElement();
+				if (left == NULL_NODE && right == NULL_NODE) {
+					return NULL_NODE;
+				} else if (left == NULL_NODE) {
+					return right;
+				} else if (right == NULL_NODE) {
+					return left;
+				}
+				right = right.delete(0, a);
+				char swap = getElement();
+				this.element = a.deleted;
+				a.deleted = swap;
 			}
-			right = right.delete(0, a);
-			char swap = getElement();
-			this.element = a.deleted;
-			a.deleted = swap;
+			if (a.treeBalanced)
+				return this;
+			return deleteFromRight(a);
 		}
-		if (a.treeBalanced)
-			return this;
-		return deleteFromRight(a);
 	}
 
 	/**
@@ -455,23 +454,17 @@ public class Node {
 	 * @return updated subtree root node
 	 */
 	private Node deleteFromLeft(H a) {
-		if (balance == Code.SAME) {
+		if (getBalance() == Code.SAME) {
 			a.treeBalanced = true;
-			balance = Code.RIGHT;
-		} else if (balance == Code.LEFT) {
-			balance = Code.SAME;
-		} else if (balance == Code.RIGHT) {
-			if (right.balance == Code.RIGHT) {
-				// do single rotate
-				balance = Code.SAME;
-				right.balance = Code.SAME;
-				return singleLeftRotate(a);
-			} else if (right.balance == Code.SAME) {
-				// do single rotate, but the height of this subtree is still the
-				// same, so a.edited does not need to to be updated.
+			return updateBalanceCode(null, Code.RIGHT, null);
+		} else if (getBalance() == Code.LEFT) {
+			return updateBalanceCode(null, Code.SAME, null);
+		} else if (getBalance() == Code.RIGHT) {
+			if (right.getBalance() == Code.RIGHT) {
+				return singleLeftRotate(a).updateBalanceCode(Code.SAME, Code.SAME, null);
+			} else if (right.getBalance() == Code.SAME) {
 				a.treeBalanced = true;
-				right.balance = Code.LEFT;
-				return singleLeftRotate(a);
+				return singleLeftRotate(a).updateBalanceCode(Code.RIGHT, Code.LEFT, null);
 			}
 			return doubleLeftRotate(a);
 		}
@@ -487,23 +480,17 @@ public class Node {
 	 * @return updated subtree root node
 	 */
 	private Node deleteFromRight(H a) {
-		if (balance == Code.SAME) {
+		if (getBalance() == Code.SAME) {
 			a.treeBalanced = true;
-			balance = Code.LEFT;
-		} else if (balance == Code.RIGHT) {
-			balance = Code.SAME;
-		} else if (balance == Code.LEFT) {
-			if (left.balance == Code.LEFT) {
-				// do single rotate
-				balance = Code.SAME;
-				left.balance = Code.SAME;
-				return singleRightRotate(a);
-			} else if (left.balance == Code.SAME) {
-				// do single rotate, but the height of this subtree is still the
-				// same, so a.edited does not need to to be updated.
+			return updateBalanceCode(null, Code.LEFT, null);
+		} else if (getBalance() == Code.RIGHT) {
+			return updateBalanceCode(null, Code.SAME, null);
+		} else if (getBalance() == Code.LEFT) {
+			if (left.getBalance() == Code.LEFT) {
+				return singleRightRotate(a).updateBalanceCode(null, Code.SAME, Code.SAME);
+			} else if (left.getBalance() == Code.SAME) {
 				a.treeBalanced = true;
-				left.balance = Code.RIGHT;
-				return singleRightRotate(a);
+				return singleRightRotate(a).updateBalanceCode(null, Code.RIGHT, Code.LEFT);
 			}
 			return doubleRightRotate(a);
 		}
@@ -532,22 +519,21 @@ public class Node {
 			return new Node(a.deleted, this, inserted, Code.LEFT);
 		} else {
 			this.size += inserted.size + 1;
-			if (balance == Code.LEFT)
+			if (getBalance() == Code.LEFT)
 				right = right.concatRight(a, inserted, heightDiff - 2);
 			else
 				right = right.concatRight(a, inserted, heightDiff - 1);
 		}
 		if (a.treeBalanced)
 			return this;
-		if (balance == Code.SAME) {
-			balance = Code.RIGHT;
-		} else if (balance == Code.LEFT) {
+		if (getBalance() == Code.SAME) {
+			return updateBalanceCode(null, Code.RIGHT, null);
+		} else if (getBalance() == Code.LEFT) {
 			a.treeBalanced = true;
-			balance = Code.SAME;
+			return updateBalanceCode(null, Code.SAME, null);
 		} else {
 			return addRotateFromRight(a);
 		}
-		return this;
 	}
 
 	/**
@@ -577,22 +563,21 @@ public class Node {
 			return new Node(a.deleted, inserted, this, Code.RIGHT);
 		} else {
 			size += inserted.size + 1;
-			if (balance == Code.RIGHT)
+			if (getBalance() == Code.RIGHT)
 				left = left.concatLeft(a, inserted, heightDiff - 2);
 			else
 				left = left.concatLeft(a, inserted, heightDiff - 1);
 		}
 		if (a.treeBalanced)
 			return this;
-		if (balance == Code.SAME) {
-			balance = Code.LEFT;
-		} else if (balance == Code.RIGHT) {
+		if (getBalance() == Code.SAME) {
+			return updateBalanceCode(null, Code.LEFT, null);
+		} else if (getBalance() == Code.RIGHT) {
 			a.treeBalanced = true;
-			balance = Code.SAME;
+			return updateBalanceCode(null, Code.SAME, null);
 		} else {
 			return addRotateFromLeft(a);
 		}
-		return this;
 	}
 
 	/**
@@ -628,7 +613,7 @@ public class Node {
 		}
 		if (pos < getRank()) {
 			Node l = left.split(pos, a, other, b);
-			b.hdiff += balance.hdiff();
+			b.hdiff += getBalance().hdiff();
 			b.deleted = getElement();
 			if (b.hdiff >= 0) {
 				other.setRoot(right.concatLeft(b, other.getRoot(), b.hdiff));
@@ -643,7 +628,7 @@ public class Node {
 			return l;
 		} else {
 			Node l = right.split(pos - getRank() - 1, a, other, b);
-			a.hdiff -= balance.hdiff();
+			a.hdiff -= getBalance().hdiff();
 			a.deleted = getElement();
 			if (a.hdiff >= 0) {
 				l = left.concatRight(a, l, a.hdiff);
@@ -669,9 +654,9 @@ public class Node {
 	 *            helper class for right tree
 	 */
 	private void synHdiff(H a, H b) {
-		if (balance == Code.LEFT)
+		if (getBalance() == Code.LEFT)
 			b.hdiff++;
-		else if (balance == Code.RIGHT)
+		else if (getBalance() == Code.RIGHT)
 			a.hdiff++;
 	}
 
@@ -697,7 +682,7 @@ public class Node {
 	 */
 	public void check(X x) {
 		if (this == NULL_NODE) {
-			if (left != null || right != null || size != 0 || balance != null || getElement() != 0)
+			if (left != null || right != null || size != 0 || getBalance() != null || getElement() != 0)
 				throw new RuntimeException("NULL_NODE changed!");
 			x.height = -1;
 			x.size = 0;
@@ -717,7 +702,7 @@ public class Node {
 
 		// check balanced code
 		x.height = Math.max(leftHeight, rightHeight) + 1;
-		if (rightHeight - leftHeight != balance.hdiff())
+		if (rightHeight - leftHeight != getBalance().hdiff())
 			throw new RuntimeException("same: " + leftHeight + " " + rightHeight);
 	}
 
