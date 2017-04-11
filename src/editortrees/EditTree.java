@@ -1,6 +1,6 @@
 package editortrees;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import editortrees.Node.Code;
 
@@ -189,15 +189,7 @@ public class EditTree {
 	 *         s does not occur
 	 */
 	public int find(String s) {
-		if (s.length() == 0)
-			return 0;
-		// create an arraylist of integers that will keep track of all matches,
-		// so we won't jump over a match if string has repeated pattern.
-		int l = root.find(s, new ArrayList<Integer>());
-		if (l == -1)
-			return -1;
-		check();
-		return l - s.length() + 1;
+		return find(s, 0);
 	}
 
 	/**
@@ -214,11 +206,7 @@ public class EditTree {
 	public int find(String s, int pos) {
 		if (s.length() == 0)
 			return pos;
-		int l;
-		if (pos <= 0)
-			l = root.find(s, new ArrayList<Integer>());
-		else
-			l = root.find(s, pos, new ArrayList<Integer>());
+		int l = root.find(s, pos, new LinkedList<Integer>());
 		if (l == -1)
 			return -1;
 		return l - s.length() + 1;

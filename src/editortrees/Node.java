@@ -1,6 +1,7 @@
 package editortrees;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 import editortrees.EditTree.H;
 
@@ -140,7 +141,7 @@ public class Node {
 
 	public int height() {
 		if (balance == Code.RIGHT)
-			return right.height() + 1;
+			return left.height() + 2;
 		return left.height() + 1;
 	}
 
@@ -197,53 +198,8 @@ public class Node {
 	}
 
 	/**
-	 * find the position of first occurence of certain string in this tree
-	 *
-	 * @param s
-	 *            string to search for
-	 * @param found
-	 *            information about already matched strings
-	 * @return the index of the end of the found string
-	 */
-	public int find(String s, ArrayList<Integer> found) {
-		// return the index of last char, if the string is found in the left
-		// branch.
-		int l = left.find(s, found);
-		if (l != -1)
-			return l;
-
-		// updating the matching indexes in the array list, return the index of
-		// last character.
-		int i = 0;
-		while (i < found.size()) {
-			int index = found.get(i);
-			if (s.charAt(index) == element) {
-				found.set(i, index + 1);
-				if (index + 1 == s.length())
-					return getRank();
-				i++;
-			} else {
-				found.remove(i);
-			}
-		}
-		// see if this can be the start of a match.
-		if (element == s.charAt(0)) {
-			found.add(1);
-			if (s.length() == 1) {
-				return getRank();
-			}
-		}
-
-		// go the the right branch if nothing is found yet.
-		int r = right.find(s, found);
-		if (r == -1)
-			return -1;
-		return getRank() + 1 + r;
-	}
-
-	/**
 	 * 
-	 * find the position of first occurence of certain string in this tree
+	 * find the position of first occurrence of certain string in this tree
 	 *
 	 * @param s
 	 *            string to search for
@@ -253,32 +209,36 @@ public class Node {
 	 *            information about already matched strings
 	 * @return
 	 */
-	public int find(String s, int pos, ArrayList<Integer> found) {
+	public int find(String s, int pos, List<Integer> found) {
 		if (pos < getRank()) {
 			int l = left.find(s, pos, found);
 			if (l != -1)
 				return l;
 		}
 		if (pos <= getRank()) {
-			int i = 0;
-			while (i < found.size()) {
-				int index = found.get(i);
+			// updating the matching indexes in the array list, return the index
+			// of
+			// last character.
+			ListIterator<Integer> itr = found.listIterator();
+			while (itr.hasNext()) {
+				int index = itr.next();
 				if (s.charAt(index) == element) {
-					found.set(i, index + 1);
 					if (index + 1 == s.length())
 						return getRank();
-					i++;
+					itr.set(index + 1);
 				} else {
-					found.remove(i);
+					itr.remove();
 				}
 			}
+			// see if this can be the start of a match.
 			if (element == s.charAt(0)) {
-				found.add(1);
 				if (s.length() == 1) {
 					return getRank();
 				}
+				found.add(1);
 			}
-			int r = right.find(s, found);
+
+			int r = right.find(s, 0, found);
 			if (r == -1)
 				return -1;
 			return getRank() + 1 + r;
@@ -903,8 +863,9 @@ public class Node {
 			throw new IndexOutOfBoundsException();
 		}
 
-		@Override
-		public int find(String s, ArrayList<Integer> found) {
+		public int find(String s, int pos, List<Integer> found) {
+			if (pos != 0)
+				throw new RuntimeException();
 			return -1;
 		}
 
