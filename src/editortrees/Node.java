@@ -270,7 +270,9 @@ public class Node {
 		} else {
 			// balance the tree
 			a.treeBalanced = true;
-			return singleLeftRotate(true, a);
+			balance = Code.SAME;
+			right.balance = Code.SAME;
+			return singleLeftRotate(a);
 		}
 		return this;
 	}
@@ -336,24 +338,11 @@ public class Node {
 		a.treeBalanced = true;
 		if (left.balance == Code.LEFT) {
 			// do single right rotate
-			return singleRightRotate(true, a);
-		}
-		// do double right rotate
-		left = left.singleLeftRotate(false, a);
-		// three cases for double rotationce, set balance codes for each case
-		if (left.balance == Code.RIGHT) {
-			left.left.balance = Code.LEFT;
 			balance = Code.SAME;
 			left.balance = Code.SAME;
-		} else if (left.balance == Code.LEFT) {
-			balance = Code.RIGHT;
-			left.balance = Code.SAME;
-			left.left.balance = Code.SAME;
-		} else {
-			balance = Code.SAME;
-			left.left.balance = Code.SAME;
+			return singleRightRotate(a);
 		}
-		return singleRightRotate(false, a);
+		return doubleRightRotate(a);
 	}
 
 	/**
@@ -369,11 +358,36 @@ public class Node {
 		a.treeBalanced = true;
 		if (right.balance == Code.RIGHT) {
 			// do single left rotate
-			return singleLeftRotate(true, a);
+			balance = Code.SAME;
+			right.balance = Code.SAME;
+			return singleLeftRotate(a);
 		}
+		return doubleLeftRotate(a);
+	}
+
+	private Node doubleRightRotate(H a) {
+		// do double right rotate
+		left = left.singleLeftRotate(a);
+		// three cases for double rotation, set balance codes for each case
+		if (left.balance == Code.RIGHT) {
+			left.left.balance = Code.LEFT;
+			balance = Code.SAME;
+			left.balance = Code.SAME;
+		} else if (left.balance == Code.LEFT) {
+			balance = Code.RIGHT;
+			left.balance = Code.SAME;
+			left.left.balance = Code.SAME;
+		} else {
+			balance = Code.SAME;
+			left.left.balance = Code.SAME;
+		}
+		return singleRightRotate(a);
+	}
+
+	private Node doubleLeftRotate(H a) {
 		// do double left rotate
-		right = right.singleRightRotate(false, a);
-		// three cases for double rotationce, set balance codes for each case
+		right = right.singleRightRotate(a);
+		// three cases for double rotation, set balance codes for each case
 		if (right.balance == Code.LEFT) {
 			right.right.balance = Code.RIGHT;
 			balance = Code.SAME;
@@ -386,7 +400,55 @@ public class Node {
 			balance = Code.SAME;
 			right.right.balance = Code.SAME;
 		}
-		return singleLeftRotate(false, a);
+		return singleLeftRotate(a);
+	}
+
+	/**
+	 * 
+	 * Single Left rotation
+	 * 
+	 * If modifyBalance is true, the balance code of both node involved in the
+	 * rotation will be set to Code.SAME. a.rotate keeps track of the total
+	 * rotations happening in the whole process.
+	 * 
+	 * @param modifyBalance
+	 * @param a
+	 *            a helper class
+	 * @return
+	 */
+	private Node singleLeftRotate(H a) {
+		a.rotate++;
+		right.size = this.size;
+		this.size = right.left.size + left.size + 1;
+		Node rl = right.left;
+		right.left = this;
+		Node r = right;
+		right = rl;
+		return r;
+	}
+
+	/**
+	 * 
+	 * Single right rotation
+	 * 
+	 * If modifyBalance is true, the balance code of both node involved in the
+	 * rotation will be set to Code.SAME. a.rotate keeps track of the total
+	 * rotations happening in the whole process.
+	 * 
+	 * @param modifyBalance
+	 * @param a
+	 *            a helper class
+	 * @return
+	 */
+	private Node singleRightRotate(H a) {
+		a.rotate++;
+		left.size = this.size;
+		this.size = left.right.size + right.size + 1;
+		Node lf = left.right;
+		left.right = this;
+		Node l = left;
+		left = lf;
+		return l;
 	}
 
 	/**
@@ -406,48 +468,33 @@ public class Node {
 		size--;
 		Code from = null;
 		if (getRank() == pos) {
-			// found the node we want to delete
 			a.deleted = element;
 			if (left == NULL_NODE && right == NULL_NODE) {
-				// leave node
 				return NULL_NODE;
 			} else if (left == NULL_NODE) {
-				// right children only node
 				return right;
 			} else if (right == NULL_NODE) {
-				// left children only node
 				return left;
 			}
-			// both children node, go to delete the smallest node on the right
-			// subtree and grab its value in a.glue by the way.
 			from = Code.RIGHT;
 			right = right.deleteSmallest(a);
 			element = a.glue;
-			// a.edited would only be false if this delection change the height
-			// of
 		} else if (pos < getRank()) {
-			// delete node from left
 			from = Code.LEFT;
 			left = left.delete(pos, a);
 		} else {
-			// delete node from right
 			from = Code.RIGHT;
 			right = right.delete(pos - getRank() - 1, a);
 		}
 
 		if (a.treeBalanced) {
 			// Tree is already balanced, so just go back.
-			// a.eited would be tree only if the heght of subtree decreases
-			// after deletion
 		} else if (balance == Code.SAME) {
-			// only tilt this subtree, the whole tree is still balanced.
 			a.treeBalanced = true;
 			balance = from.inverse();
 		} else if (balance == from) {
-			// make this subtree perfectly balanced.
 			balance = Code.SAME;
 		} else if (balance != from) {
-			// this node is unbalanced, so we need to fix it!
 			if (from == Code.LEFT) {
 				return deleteRotateFromLeft(a);
 			} else if (from == Code.RIGHT) {
@@ -468,16 +515,12 @@ public class Node {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public Node deleteSmallest(H a) throws IndexOutOfBoundsException {
-		if (this == NULL_NODE)
-			throw new RuntimeException();
 		if (left == NULL_NODE) {
-			// find the smallest element
 			a.glue = element;
 			return right;
 		}
 		size--;
 		left = left.deleteSmallest(a);
-		// balance the tree
 		if (a.treeBalanced) {
 			// Tree is already balanced
 		} else if (balance == Code.SAME) {
@@ -501,15 +544,12 @@ public class Node {
 	 * @return updated node
 	 */
 	public Node deleteBiggest(H a) {
-		if (this == NULL_NODE)
-			throw new RuntimeException();
 		if (right == NULL_NODE) {
 			a.glue = element;
 			return left;
 		}
 		size--;
 		right = right.deleteBiggest(a);
-		// balance the tree
 		if (a.treeBalanced) {
 			// Tree is already balanced
 		} else if (balance == Code.SAME) {
@@ -534,32 +574,17 @@ public class Node {
 	private Node deleteRotateFromLeft(H a) {
 		if (right.balance == Code.RIGHT) {
 			// do single rotate
-			return singleLeftRotate(true, a);
+			balance = Code.SAME;
+			right.balance = Code.SAME;
+			return singleLeftRotate(a);
 		} else if (right.balance == Code.SAME) {
 			// do single rotate, but the height of this subtree is still the
 			// same, so a.edited does not need to to be updated.
 			a.treeBalanced = true;
 			right.balance = Code.LEFT;
-			return singleLeftRotate(false, a);
-		} else {
-			// do double rotate, set balance code according to cases
-			right = right.singleRightRotate(false, a);
-			// three cases for double rotationce, set balance codes for each
-			// case
-			if (right.balance == Code.LEFT) {
-				right.right.balance = Code.RIGHT;
-				balance = Code.SAME;
-				right.balance = Code.SAME;
-			} else if (right.balance == Code.RIGHT) {
-				balance = Code.LEFT;
-				right.right.balance = Code.SAME;
-				right.balance = Code.SAME;
-			} else {
-				balance = Code.SAME;
-				right.right.balance = Code.SAME;
-			}
-			return singleLeftRotate(false, a);
+			return singleLeftRotate(a);
 		}
+		return doubleLeftRotate(a);
 	}
 
 	/**
@@ -573,30 +598,17 @@ public class Node {
 	private Node deleteRotateFromRight(H a) {
 		if (left.balance == Code.LEFT) {
 			// do single rotate
-			return singleRightRotate(true, a);
+			balance = Code.SAME;
+			left.balance = Code.SAME;
+			return singleRightRotate(a);
 		} else if (left.balance == Code.SAME) {
 			// do single rotate, but the height of this subtree is still the
 			// same, so a.edited does not need to to be updated.
 			a.treeBalanced = true;
 			left.balance = Code.RIGHT;
-			return singleRightRotate(false, a);
+			return singleRightRotate(a);
 		}
-		// do double rotate, set balance code according to cases
-		left = left.singleLeftRotate(false, a);
-		// three cases for double rotationce, set balance codes for each case
-		if (left.balance == Code.RIGHT) {
-			left.left.balance = Code.LEFT;
-			balance = Code.SAME;
-			left.balance = Code.SAME;
-		} else if (left.balance == Code.LEFT) {
-			balance = Code.RIGHT;
-			left.balance = Code.SAME;
-			left.left.balance = Code.SAME;
-		} else {
-			balance = Code.SAME;
-			left.left.balance = Code.SAME;
-		}
-		return singleRightRotate(false, a);
+		return doubleRightRotate(a);
 	}
 
 	/**
@@ -775,62 +787,6 @@ public class Node {
 		else
 			a.hdiff = 0;
 		a.treeBalanced = false;
-	}
-
-	/**
-	 * 
-	 * Single Left rotation
-	 * 
-	 * If modifyBalance is true, the balance code of both node involved in the
-	 * rotation will be set to Code.SAME. a.rotate keeps track of the total
-	 * rotations happening in the whole process.
-	 * 
-	 * @param modifyBalance
-	 * @param a
-	 *            a helper class
-	 * @return
-	 */
-	private Node singleLeftRotate(boolean modifyBalance, H a) {
-		a.rotate++;
-		if (modifyBalance) {
-			balance = Code.SAME;
-			right.balance = Code.SAME;
-		}
-		right.size = this.size;
-		this.size = right.left.size + left.size + 1;
-		Node rl = right.left;
-		right.left = this;
-		Node r = right;
-		right = rl;
-		return r;
-	}
-
-	/**
-	 * 
-	 * Single right rotation
-	 * 
-	 * If modifyBalance is true, the balance code of both node involved in the
-	 * rotation will be set to Code.SAME. a.rotate keeps track of the total
-	 * rotations happening in the whole process.
-	 * 
-	 * @param modifyBalance
-	 * @param a
-	 *            a helper class
-	 * @return
-	 */
-	private Node singleRightRotate(boolean modifyBalance, H a) {
-		a.rotate++;
-		if (modifyBalance) {
-			balance = Code.SAME;
-			left.balance = Code.SAME;
-		}
-		left.size = this.size;
-		this.size = left.right.size + right.size + 1;
-		Node lf = left.right;
-		left.right = this;
-		Node l = left;
-		left = lf;
-		return l;
 	}
 
 	/**
