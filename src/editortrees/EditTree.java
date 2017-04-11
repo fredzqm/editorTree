@@ -161,7 +161,7 @@ public class EditTree {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public char get(int pos) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos >= root.size())
+		if (pos < 0 || pos >= size())
 			throw new IndexOutOfBoundsException();
 		return root.get(pos);
 	}
@@ -180,7 +180,7 @@ public class EditTree {
 	 *             within this tree.
 	 */
 	public String get(int pos, int length) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos + length > root.size())
+		if (pos < 0 || pos + length > size())
 			throw new IndexOutOfBoundsException();
 		StringBuilder sb = new StringBuilder();
 		root.get(pos, pos + length, sb);
@@ -226,10 +226,7 @@ public class EditTree {
 	 *            character to add to the end of this tree.
 	 */
 	public void add(char c) {
-		H a = new H();
-		root = root.add(c, root.size(), a);
-		totalRotationCount += a.rotate;
-		check();
+		add(c, size());
 	}
 
 	/**
@@ -243,7 +240,7 @@ public class EditTree {
 	 *             id pos is negative or too large for this tree
 	 */
 	public void add(char c, int pos) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos > root.size())
+		if (pos < 0 || pos > size())
 			throw new IndexOutOfBoundsException();
 		H a = new H();
 		root = root.add(c, pos, a);
@@ -260,7 +257,7 @@ public class EditTree {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public char delete(int pos) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos >= root.size())
+		if (pos < 0 || pos >= size())
 			throw new IndexOutOfBoundsException();
 		H a = new H();
 		root = root.delete(pos, a);
@@ -304,8 +301,6 @@ public class EditTree {
 	 *             if this == other
 	 */
 	public void concatenate(EditTree other) throws IllegalArgumentException {
-		if (this == other)
-			throw new IllegalArgumentException();
 		int height = root.height();
 		int heightOther = other.root.height();
 		H a = new H();
@@ -314,7 +309,7 @@ public class EditTree {
 			if (heightOther == -1) {
 				return;
 			} else if (heightOther == 0) {
-				root = root.add(other.root.getElement(), root.size(), a);
+				root = root.add(other.root.getElement(), size(), a);
 			} else {
 				other.root = other.root.delete(0, a);
 				if (a.treeBalanced)
@@ -332,7 +327,7 @@ public class EditTree {
 			} else if (height == 0) {
 				root = other.root.add(root.getElement(), 0, a);
 			} else {
-				root = root.delete(root.size() - 1, a);
+				root = root.delete(size() - 1, a);
 				if (a.treeBalanced)
 					a.treeBalanced = false;
 				else
@@ -357,7 +352,7 @@ public class EditTree {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public EditTree split(int pos) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos >= root.size())
+		if (pos < 0 || pos >= size())
 			throw new IndexOutOfBoundsException();
 		EditTree spl = new EditTree();
 		H a = new H();
@@ -423,7 +418,7 @@ public class EditTree {
 	 * 
 	 */
 	public void check() {
-		if (root.size() < 1000)
+		if (size() < 1000)
 			root.check(new X());
 	}
 
@@ -431,12 +426,12 @@ public class EditTree {
 		public int height;
 		public int size;
 	}
-	
-	public Iterator<Node> nodeIterator() {
+
+	public Iterator<Character> nodeIterator() {
 		return new InOrderIterator(root);
 	}
-	
-	static class InOrderIterator implements Iterator<Node> {
+
+	static class InOrderIterator implements Iterator<Character> {
 		Stack<Node> stack;
 		Node current;
 
@@ -455,7 +450,7 @@ public class EditTree {
 		}
 
 		@Override
-		public Node next() {
+		public Character next() {
 			if (!hasNext()) {
 				throw new NoSuchElementException();
 			}
@@ -465,7 +460,7 @@ public class EditTree {
 				stack.push(next);
 				next = next.getLeft();
 			}
-			return current;
+			return current.getElement();
 		}
 
 	}
