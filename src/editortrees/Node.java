@@ -1009,44 +1009,4 @@ public class Node {
 		return left.slowSize() + 1 + right.slowSize();
 	}
 
-	// public int getRank() {
-	// return rank;
-	// }
-	//
-	// public Code getBalance() {
-	// return balance;
-	// }
-	//
-	// public char getElement() {
-	// return element;
-	// }
-	//
-	// public Node getLeft() {
-	// return left;
-	// }
-	//
-	// public boolean hasLeft() {
-	// return left != NULL_NODE;
-	// }
-	//
-	// public Node getRight() {
-	// return right;
-	// }
-	//
-	// public boolean hasRight() {
-	// return right != NULL_NODE;
-	// }
-	//
-	// public Node getParent() {
-	// return null;
-	// }
-	//
-	// public boolean hasParent() {
-	// return false;
-	// }
-	//
-	// public DisplayableNodeWrapper getDisplayableNodePart() {
-	// return new DisplayableNodeWrapper(this);
-	// }
-
 }
