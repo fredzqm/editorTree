@@ -224,7 +224,7 @@ public class EditTree {
 	 */
 	public void add(char c) {
 		H a = new H();
-		root = root.addEnd(c, a);
+		root = root.add(c, root.size(), a);
 		totalRotationCount += a.rotate;
 		check();
 	}
@@ -309,13 +309,9 @@ public class EditTree {
 		if (height >= heightOther) {
 			// this tree is higher than the other tree
 			if (heightOther == -1) {
-				// do nothing if other tree is empty.
 				return;
 			} else if (heightOther == 0) {
-				// just add a element if other root has only one element so
-				// after
-				// remove the glue, other tree is empty
-				root = root.addEnd(other.root.element, a);
+				root = root.add(other.root.element, root.size(), a);
 			} else {
 				other.root = other.root.delete(0, a);
 				if (a.treeBalanced)
@@ -327,13 +323,10 @@ public class EditTree {
 		} else {
 			// this tree is lower than the other tree
 			if (height == -1) {
-				// do nothing if other tree is empty.
 				root = other.root;
 				other.root = Node.NULL_NODE;
 				return;
 			} else if (height == 0) {
-				// just add a element if this tree has only one element so after
-				// remove the glue, this tree is empty
 				root = other.root.add(root.element, 0, a);
 			} else {
 				root = root.delete(root.size - 1, a);
@@ -394,13 +387,13 @@ public class EditTree {
 		 * glue two subtree together.
 		 */
 		public char deleted;
-		
+
 		/**
 		 * keep track of the number of rotation happened during the modification
 		 * operation
 		 */
 		public int rotate;
-		
+
 		/**
 		 * store the height differernce compared to a certain subtree in split
 		 * method

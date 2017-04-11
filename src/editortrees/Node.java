@@ -247,37 +247,6 @@ public class Node {
 	}
 
 	/**
-	 * add an element c into the end of this subtree
-	 * 
-	 * @param c
-	 * @param a
-	 * @return updated subtree root node
-	 */
-	public Node addEnd(char c, H a) {
-		if (this == NULL_NODE)
-			return new Node(c);
-		size++;
-		right = right.addEnd(c, a);
-		if (a.treeBalanced) {
-			// it will do nothing if it has been edited before.
-		} else if (balance == Code.SAME) {
-			// keep searching for unbalance.
-			balance = Code.RIGHT;
-		} else if (balance == Code.LEFT) {
-			// height of subtree isn't changed, quit searching.
-			a.treeBalanced = true;
-			balance = Code.SAME;
-		} else {
-			// balance the tree
-			a.treeBalanced = true;
-			balance = Code.SAME;
-			right.balance = Code.SAME;
-			return singleLeftRotate(a);
-		}
-		return this;
-	}
-
-	/**
 	 * insert a char c into the tree given index.
 	 * 
 	 * @param c
@@ -305,9 +274,9 @@ public class Node {
 			right = right.add(c, pos - getRank() - 1, a);
 			from = Code.RIGHT;
 		}
-		if (a.treeBalanced) {
-			// it will do nothing if it has been edited before.
-		} else if (balance == Code.SAME) {
+		if (a.treeBalanced)
+			return this;
+		if (balance == Code.SAME) {
 			// keep searching unbalanced node
 			balance = from;
 		} else if (balance != from) {
@@ -466,8 +435,15 @@ public class Node {
 		if (this == NULL_NODE)
 			throw new RuntimeException();
 		size--;
-		Code from = null;
-		if (getRank() == pos) {
+		if (pos < getRank()) {
+			left = left.delete(pos, a);
+			if (a.treeBalanced)
+				return this;
+			return deleteFromLeft(a);
+		}
+		if (getRank() < pos) {
+			right = right.delete(pos - getRank() - 1, a);
+		} else {
 			a.deleted = element;
 			if (left == NULL_NODE && right == NULL_NODE) {
 				return NULL_NODE;
@@ -476,30 +452,24 @@ public class Node {
 			} else if (right == NULL_NODE) {
 				return left;
 			}
-			from = Code.RIGHT;
 			right = right.delete(0, a);
 			char x = element;
 			element = a.deleted;
 			a.deleted = x;
-		} else if (pos < getRank()) {
-			from = Code.LEFT;
-			left = left.delete(pos, a);
-		} else {
-			from = Code.RIGHT;
-			right = right.delete(pos - getRank() - 1, a);
 		}
-
-		if (a.treeBalanced) {
-			// Tree is already balanced, so just go back.
+		if (a.treeBalanced)
 			return this;
-		}
-		if (from == Code.RIGHT) {
-			return deleteFromRight(a);
-		} else {
-			return deleteFromLeft(a);
-		}
+		return deleteFromRight(a);
 	}
 
+	/**
+	 * Knowing the height of right subtree decreased due to a deletion, balance
+	 * the tree
+	 * 
+	 * @param a
+	 *            helper class
+	 * @return updated subtree root node
+	 */
 	private Node deleteFromLeft(H a) {
 		if (balance == Code.SAME) {
 			a.treeBalanced = true;
@@ -507,11 +477,31 @@ public class Node {
 		} else if (balance == Code.LEFT) {
 			balance = Code.SAME;
 		} else if (balance == Code.RIGHT) {
-			return deleteRotateFromLeft(a);
+			if (right.balance == Code.RIGHT) {
+				// do single rotate
+				balance = Code.SAME;
+				right.balance = Code.SAME;
+				return singleLeftRotate(a);
+			} else if (right.balance == Code.SAME) {
+				// do single rotate, but the height of this subtree is still the
+				// same, so a.edited does not need to to be updated.
+				a.treeBalanced = true;
+				right.balance = Code.LEFT;
+				return singleLeftRotate(a);
+			}
+			return doubleLeftRotate(a);
 		}
 		return this;
 	}
 
+	/**
+	 * Knowing the height of right subtree decreased due to a deletion, balance
+	 * the tree
+	 * 
+	 * @param a
+	 *            helper class
+	 * @return updated subtree root node
+	 */
 	private Node deleteFromRight(H a) {
 		if (balance == Code.SAME) {
 			a.treeBalanced = true;
@@ -519,57 +509,21 @@ public class Node {
 		} else if (balance == Code.RIGHT) {
 			balance = Code.SAME;
 		} else if (balance == Code.LEFT) {
-			return deleteRotateFromRight(a);
+			if (left.balance == Code.LEFT) {
+				// do single rotate
+				balance = Code.SAME;
+				left.balance = Code.SAME;
+				return singleRightRotate(a);
+			} else if (left.balance == Code.SAME) {
+				// do single rotate, but the height of this subtree is still the
+				// same, so a.edited does not need to to be updated.
+				a.treeBalanced = true;
+				left.balance = Code.RIGHT;
+				return singleRightRotate(a);
+			}
+			return doubleRightRotate(a);
 		}
 		return this;
-	}
-
-	/**
-	 * Do the rotation during the delete process if the delete process causes
-	 * the unbalance because its left subtree's height decrease
-	 * 
-	 * @param a
-	 *            helper class
-	 * @return updated subtree root node
-	 */
-	private Node deleteRotateFromLeft(H a) {
-		if (right.balance == Code.RIGHT) {
-			// do single rotate
-			balance = Code.SAME;
-			right.balance = Code.SAME;
-			return singleLeftRotate(a);
-		} else if (right.balance == Code.SAME) {
-			// do single rotate, but the height of this subtree is still the
-			// same, so a.edited does not need to to be updated.
-			a.treeBalanced = true;
-			right.balance = Code.LEFT;
-			return singleLeftRotate(a);
-		}
-		return doubleLeftRotate(a);
-	}
-
-	/**
-	 * Do the rotation during the delete process if the delete process causes
-	 * the unbalance because its right subtree's height decrease
-	 * 
-	 * @param a
-	 *            helper class
-	 * @return updated subtree root node
-	 */
-	private Node deleteRotateFromRight(H a) {
-		if (left.balance == Code.LEFT) {
-			// do single rotate
-			balance = Code.SAME;
-			left.balance = Code.SAME;
-			return singleRightRotate(a);
-		} else if (left.balance == Code.SAME) {
-			// do single rotate, but the height of this subtree is still the
-			// same, so a.edited does not need to to be updated.
-			a.treeBalanced = true;
-			left.balance = Code.RIGHT;
-			return singleRightRotate(a);
-		}
-		return doubleRightRotate(a);
 	}
 
 	/**
@@ -681,7 +635,7 @@ public class Node {
 				spl.setRoot(spl.getRoot().add(element, 0, b));
 				updateHdiff(b);
 			} else {
-				l = left.addEnd(element, a);
+				l = left.add(element, left.size(), a);
 				updateHdiff(a);
 			}
 			synHdiff(a, b);
