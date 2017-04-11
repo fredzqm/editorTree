@@ -264,12 +264,6 @@ public class EditTree {
 		totalRotationCount += a.rotate;
 		check();
 		return a.deleted;
-		// Implementation requirement:
-		// When deleting a node with two children, you normally replace the
-		// node to be deleted with either its in-order successor or predecessor.
-		// The tests assume assume that you will replace it with the
-		// *successor*.
-		// replace by a real calculation.
 	}
 
 	/**
@@ -324,8 +318,8 @@ public class EditTree {
 				root = root.addEnd(other.root.element, a);
 			} else {
 				other.root = other.root.deleteSmallest(a);
-				if (a.edited)
-					a.edited = false;
+				if (a.treeBalanced)
+					a.treeBalanced = false;
 				else
 					heightOther--;
 				root = root.concatRight(a, other.root, height - heightOther);
@@ -343,8 +337,8 @@ public class EditTree {
 				root = other.root.add(root.element, 0, a);
 			} else {
 				root = root.deleteBiggest(a);
-				if (a.edited)
-					a.edited = false;
+				if (a.treeBalanced)
+					a.treeBalanced = false;
 				else
 					height--;
 				root = other.root.concatLeft(a, root, heightOther - height);
@@ -390,13 +384,16 @@ public class EditTree {
 	 */
 	public static class H {
 		/**
-		 * keep track of whether the tree need more modification to balance
+		 * keep track of whether the tree is already balanced. true if the tree
+		 * is already balanced and requires no more rotation to balance
 		 */
-		public boolean edited;
+		public boolean treeBalanced;
+
 		/**
 		 * store the element deleted from the tree
 		 */
 		public char deleted;
+		
 		/**
 		 * store element that was removed some leave and will be used to help
 		 * glue two subtree together.
@@ -414,7 +411,7 @@ public class EditTree {
 		public int hdiff;
 
 		public H() {
-			edited = false;
+			treeBalanced = false;
 			deleted = '\n';
 			glue = '\n';
 			rotate = 0;

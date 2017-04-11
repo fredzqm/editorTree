@@ -258,18 +258,18 @@ public class Node {
 			return new Node(c);
 		size++;
 		right = right.addEnd(c, a);
-		if (a.edited) {
+		if (a.treeBalanced) {
 			// it will do nothing if it has been edited before.
 		} else if (balance == Code.SAME) {
 			// keep searching for unbalance.
 			balance = Code.RIGHT;
 		} else if (balance == Code.LEFT) {
 			// height of subtree isn't changed, quit searching.
-			a.edited = true;
+			a.treeBalanced = true;
 			balance = Code.SAME;
 		} else {
 			// balance the tree
-			a.edited = true;
+			a.treeBalanced = true;
 			return singleLeftRotate(true, a);
 		}
 		return this;
@@ -303,14 +303,14 @@ public class Node {
 			right = right.add(c, pos - getRank() - 1, a);
 			from = Code.RIGHT;
 		}
-		if (a.edited) {
+		if (a.treeBalanced) {
 			// it will do nothing if it has been edited before.
 		} else if (balance == Code.SAME) {
 			// keep searching unbalanced node
 			balance = from;
 		} else if (balance != from) {
 			// finish searching unbalanced node
-			a.edited = true;
+			a.treeBalanced = true;
 			balance = Code.SAME;
 		} else {
 			// fixed unbalanced node
@@ -333,7 +333,7 @@ public class Node {
 	 * @return updated subtree root node
 	 */
 	private Node addRotateFromLeft(H a) {
-		a.edited = true;
+		a.treeBalanced = true;
 		if (left.balance == Code.LEFT) {
 			// do single right rotate
 			return singleRightRotate(true, a);
@@ -366,7 +366,7 @@ public class Node {
 	 * @return updated subtree root node
 	 */
 	private Node addRotateFromRight(H a) {
-		a.edited = true;
+		a.treeBalanced = true;
 		if (right.balance == Code.RIGHT) {
 			// do single left rotate
 			return singleLeftRotate(true, a);
@@ -435,13 +435,13 @@ public class Node {
 			right = right.delete(pos - getRank() - 1, a);
 		}
 
-		if (a.edited) {
+		if (a.treeBalanced) {
 			// Tree is already balanced, so just go back.
 			// a.eited would be tree only if the heght of subtree decreases
 			// after deletion
 		} else if (balance == Code.SAME) {
 			// only tilt this subtree, the whole tree is still balanced.
-			a.edited = true;
+			a.treeBalanced = true;
 			balance = from.inverse();
 		} else if (balance == from) {
 			// make this subtree perfectly balanced.
@@ -478,10 +478,10 @@ public class Node {
 		size--;
 		left = left.deleteSmallest(a);
 		// balance the tree
-		if (a.edited) {
+		if (a.treeBalanced) {
 			// Tree is already balanced
 		} else if (balance == Code.SAME) {
-			a.edited = true;
+			a.treeBalanced = true;
 			balance = Code.RIGHT;
 		} else if (balance == Code.LEFT) {
 			balance = Code.SAME;
@@ -510,10 +510,10 @@ public class Node {
 		size--;
 		right = right.deleteBiggest(a);
 		// balance the tree
-		if (a.edited) {
+		if (a.treeBalanced) {
 			// Tree is already balanced
 		} else if (balance == Code.SAME) {
-			a.edited = true;
+			a.treeBalanced = true;
 			balance = Code.LEFT;
 		} else if (balance == Code.RIGHT) {
 			balance = Code.SAME;
@@ -538,7 +538,7 @@ public class Node {
 		} else if (right.balance == Code.SAME) {
 			// do single rotate, but the height of this subtree is still the
 			// same, so a.edited does not need to to be updated.
-			a.edited = true;
+			a.treeBalanced = true;
 			right.balance = Code.LEFT;
 			return singleLeftRotate(false, a);
 		} else {
@@ -577,7 +577,7 @@ public class Node {
 		} else if (left.balance == Code.SAME) {
 			// do single rotate, but the height of this subtree is still the
 			// same, so a.edited does not need to to be updated.
-			a.edited = true;
+			a.treeBalanced = true;
 			left.balance = Code.RIGHT;
 			return singleRightRotate(false, a);
 		}
@@ -627,11 +627,11 @@ public class Node {
 			else
 				right = right.concatRight(a, inserted, heightDiff - 1);
 		}
-		if (a.edited) {
+		if (a.treeBalanced) {
 		} else if (balance == Code.SAME) {
 			balance = Code.RIGHT;
 		} else if (balance == Code.LEFT) {
-			a.edited = true;
+			a.treeBalanced = true;
 			balance = Code.SAME;
 		} else {
 			return addRotateFromRight(a);
@@ -671,11 +671,11 @@ public class Node {
 			else
 				left = left.concatLeft(a, inserted, heightDiff - 1);
 		}
-		if (a.edited) {
+		if (a.treeBalanced) {
 		} else if (balance == Code.SAME) {
 			balance = Code.LEFT;
 		} else if (balance == Code.RIGHT) {
-			a.edited = true;
+			a.treeBalanced = true;
 			balance = Code.SAME;
 		} else {
 			return addRotateFromLeft(a);
@@ -770,11 +770,11 @@ public class Node {
 	 * @param a
 	 */
 	private static void updateHdiff(H a) {
-		if (a.edited)
+		if (a.treeBalanced)
 			a.hdiff = 1;
 		else
 			a.hdiff = 0;
-		a.edited = false;
+		a.treeBalanced = false;
 	}
 
 	/**
