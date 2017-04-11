@@ -12,11 +12,11 @@ import editortrees.EditTree.H;
  *
  */
 public class Node {
-	public static final Node NULL_NODE = new Null_Node();
+	public static final Node NULL_NODE = new Node();
 
 	public enum Code {
 		SAME, LEFT, RIGHT;
-		
+
 		@Override
 		public String toString() {
 			switch (this) {
@@ -80,7 +80,7 @@ public class Node {
 
 	public Node() {
 	}
-	
+
 	/**
 	 * 
 	 * construct a node given all of its data
@@ -115,19 +115,27 @@ public class Node {
 	 * @return the root node
 	 */
 	public Node constructFromTree() {
+		if (this == NULL_NODE)
+			return NULL_NODE;
 		return new Node(element, left.constructFromTree(), right.constructFromTree(), balance);
 	}
 
 	@Override
 	public String toString() {
+		if (this == NULL_NODE)
+			return "";
 		return left.toString() + element + right.toString();
 	}
 
 	public String toDebugString() {
+		if (this == NULL_NODE)
+			return "";
 		return "" + element + getRank() + balance + ", " + left.toDebugString() + right.toDebugString();
 	}
 
 	public int height() {
+		if (this == NULL_NODE)
+			return -1;
 		if (balance == Code.RIGHT)
 			return left.height() + 2;
 		return left.height() + 1;
@@ -197,6 +205,11 @@ public class Node {
 	 * @return
 	 */
 	public int find(String s, int pos, List<Integer> found) {
+		if (this == NULL_NODE) {
+			if (pos != 0)
+				throw new RuntimeException();
+			return -1;
+		}
 		if (pos < getRank()) {
 			int l = left.find(s, pos, found);
 			if (l != -1)
@@ -241,6 +254,8 @@ public class Node {
 	 * @return updated subtree root node
 	 */
 	public Node addEnd(char c, H a) {
+		if (this == NULL_NODE)
+			return new Node(c);
 		size++;
 		right = right.addEnd(c, a);
 		if (a.edited) {
@@ -272,6 +287,11 @@ public class Node {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public Node add(char c, int pos, H a) throws IndexOutOfBoundsException {
+		if (this == NULL_NODE) {
+			if (pos > 0)
+				throw new RuntimeException();
+			return new Node(c);
+		}
 		Code from;
 		size++;
 		if (pos <= getRank()) {
@@ -381,6 +401,8 @@ public class Node {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public Node delete(int pos, H a) throws IndexOutOfBoundsException {
+		if (this == NULL_NODE)
+			throw new RuntimeException();
 		size--;
 		Code from = null;
 		if (getRank() == pos) {
@@ -446,6 +468,8 @@ public class Node {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public Node deleteSmallest(H a) throws IndexOutOfBoundsException {
+		if (this == NULL_NODE)
+			throw new RuntimeException();
 		if (left == NULL_NODE) {
 			// find the smallest element
 			a.glue = element;
@@ -477,6 +501,8 @@ public class Node {
 	 * @return updated node
 	 */
 	public Node deleteBiggest(H a) {
+		if (this == NULL_NODE)
+			throw new RuntimeException();
 		if (right == NULL_NODE) {
 			a.glue = element;
 			return left;
@@ -587,6 +613,8 @@ public class Node {
 	 * @return the updated root node
 	 */
 	public Node concatRight(H a, Node inserted, int heightDiff) {
+		if (this == NULL_NODE)
+			throw new RuntimeException();
 		if (heightDiff == 0) {
 			// when
 			return new Node(a.glue, this, inserted, Code.SAME);
@@ -627,6 +655,8 @@ public class Node {
 	 * @return the updated root node
 	 */
 	public Node concatLeft(H a, Node inserted, int heightDiff) {
+		if (this == NULL_NODE)
+			throw new RuntimeException();
 		if (heightDiff < 0) {
 			throw new RuntimeException("" + heightDiff);
 		}
@@ -668,6 +698,8 @@ public class Node {
 	 * @return root node of the left splited tree
 	 */
 	public Node split(int pos, H a, EditTree spl, H b) {
+		if (this == NULL_NODE)
+			throw new RuntimeException();
 		if (pos == getRank() || pos == getRank() + 1) {
 			// basis case when we can cut this subtree besides the node
 			Node l = left;
@@ -802,110 +834,16 @@ public class Node {
 	}
 
 	/**
-	 * 
-	 * Solve the basic condition of the tree.
-	 *
-	 * @author zhangq2. Created Apr 21, 2015.
-	 */
-	static class Null_Node extends Node {
-		public Null_Node() {
-			super();
-			left = this;
-			right = this;
-			size = 0;
-		}
-
-		@Override
-		public String toString() {
-			return "";
-		}
-
-		@Override
-		public Node constructFromTree() {
-			return NULL_NODE;
-		}
-
-		@Override
-		public String toDebugString() {
-			return "";
-		}
-
-		@Override
-		public int height() {
-			return -1;
-		}
-
-		public int find(String s, int pos, List<Integer> found) {
-			if (pos != 0)
-				throw new RuntimeException();
-			return -1;
-		}
-
-		@Override
-		public Node add(char c, int pos, EditTree.H edit) {
-			if (pos > 0)
-				throw new RuntimeException();
-			return new Node(c);
-		}
-
-		@Override
-		public Node addEnd(char c, EditTree.H edit) {
-			return new Node(c);
-		}
-
-		@Override
-		public Node delete(int pos, H a) throws IndexOutOfBoundsException {
-			throw new RuntimeException();
-		}
-
-		@Override
-		public Node deleteSmallest(H a) throws IndexOutOfBoundsException {
-			throw new RuntimeException();
-		}
-
-		@Override
-		public Node deleteBiggest(H a) throws IndexOutOfBoundsException {
-			throw new RuntimeException();
-		}
-
-		@Override
-		public Node concatRight(H a, Node inserted, int heightDiff) {
-			throw new RuntimeException();
-		}
-
-		@Override
-		public Node concatLeft(H a, Node inserted, int heightDiff) {
-			throw new RuntimeException();
-		}
-
-		@Override
-		public Node split(int pos, H a, EditTree spl, H b) {
-			throw new RuntimeException();
-		}
-
-		@Override
-		public void check() {
-			if (left != NULL_NODE || right != NULL_NODE)
-				throw new RuntimeException("NULL_NODE changed!");
-		}
-
-		@Override
-		public int slowHeight() {
-			return -1;
-		}
-
-		@Override
-		public int slowSize() {
-			return 0;
-		}
-	}
-
-	/**
 	 * check whether this node has correct rank, balance code, whether NULL_NODE
 	 * stays the same.
 	 *
 	 */
 	public void check() {
+		if (this == NULL_NODE) {
+			if (left != null || right != null || size != 0 || balance != null || element != 0)
+				throw new RuntimeException("NULL_NODE changed!");
+			return;
+		}
 		int s = slowSize();
 		if (s != size)
 			throw new RuntimeException("size: " + s + " " + size);
@@ -936,6 +874,8 @@ public class Node {
 	 * @return height
 	 */
 	public int slowHeight() {
+		if (this == NULL_NODE)
+			return -1;
 		return Math.max(left.slowHeight(), right.slowHeight()) + 1;
 	}
 
@@ -945,6 +885,8 @@ public class Node {
 	 * @return size
 	 */
 	public int slowSize() {
+		if (this == NULL_NODE)
+			return 0;
 		return left.slowSize() + 1 + right.slowSize();
 	}
 

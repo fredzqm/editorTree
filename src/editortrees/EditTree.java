@@ -434,7 +434,7 @@ public class EditTree {
 	 * 
 	 */
 	public void check() {
-		if (root.getRank() < 1000)
+		if (root.size() < 1000)
 			root.check();
 	}
 
