@@ -301,6 +301,8 @@ public class EditTree {
 	 *             if this == other
 	 */
 	public void concatenate(EditTree other) throws IllegalArgumentException {
+		if (this == other)
+			throw new IllegalArgumentException();
 		int height = root.height();
 		int heightOther = other.root.height();
 		H a = new H();

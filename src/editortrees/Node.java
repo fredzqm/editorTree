@@ -298,10 +298,10 @@ public class Node {
 	private Node addRotateFromLeft(H a) {
 		a.treeBalanced = true;
 		if (left.balance == Code.LEFT) {
-			// do single right rotate
-			balance = Code.SAME;
-			left.balance = Code.SAME;
-			return singleRightRotate(a);
+			Node t = singleRightRotate(a);
+			t.balance = Code.SAME;
+			t.right.balance = Code.SAME;
+			return t;
 		}
 		return doubleRightRotate(a);
 	}
@@ -309,7 +309,7 @@ public class Node {
 	/**
 	 * 
 	 * Do the rotation during the add process if the add process causes the
-	 * inbalance This is rotate from right to left
+	 * Imbalance This is rotate from right to left
 	 *
 	 * @param a
 	 *            helper class
@@ -319,9 +319,10 @@ public class Node {
 		a.treeBalanced = true;
 		if (right.balance == Code.RIGHT) {
 			// do single left rotate
-			balance = Code.SAME;
-			right.balance = Code.SAME;
-			return singleLeftRotate(a);
+			Node t = singleLeftRotate(a);
+			t.balance = Code.SAME;
+			t.left.balance = Code.SAME;
+			return t;
 		}
 		return doubleLeftRotate(a);
 	}
@@ -330,38 +331,29 @@ public class Node {
 		// do double right rotate
 		left = left.singleLeftRotate(a);
 		// three cases for double rotation, set balance codes for each case
-		if (left.balance == Code.RIGHT) {
-			left.left.balance = Code.LEFT;
-			balance = Code.SAME;
-			left.balance = Code.SAME;
-		} else if (left.balance == Code.LEFT) {
-			balance = Code.RIGHT;
-			left.balance = Code.SAME;
-			left.left.balance = Code.SAME;
-		} else {
-			balance = Code.SAME;
-			left.left.balance = Code.SAME;
-		}
-		return singleRightRotate(a);
+		return singleRightRotate(a).updateDoubleRotationCode();
 	}
 
 	private Node doubleLeftRotate(H a) {
 		// do double left rotate
 		right = right.singleRightRotate(a);
 		// three cases for double rotation, set balance codes for each case
-		if (right.balance == Code.LEFT) {
-			right.right.balance = Code.RIGHT;
-			balance = Code.SAME;
+		return singleLeftRotate(a).updateDoubleRotationCode();
+	}
+
+	private Node updateDoubleRotationCode() {
+		if (balance == Code.RIGHT) {
+			left.balance = Code.LEFT;
 			right.balance = Code.SAME;
-		} else if (right.balance == Code.RIGHT) {
-			balance = Code.LEFT;
-			right.right.balance = Code.SAME;
-			right.balance = Code.SAME;
+		} else if (balance == Code.LEFT) {
+			left.balance = Code.SAME;
+			right.balance = Code.RIGHT;
 		} else {
-			balance = Code.SAME;
-			right.right.balance = Code.SAME;
+			left.balance = Code.SAME;
+			right.balance = Code.SAME;
 		}
-		return singleLeftRotate(a);
+		balance = Code.SAME;
+		return this;
 	}
 
 	/**

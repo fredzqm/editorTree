@@ -79,6 +79,10 @@ public class DisplayableBinaryTree extends JComponent {
 	private double angle;
 	private boolean goingCrazy;
 
+	public DisplayableBinaryTree(EditTree tree) {
+		this(tree, 960, 1080, true);
+	}
+
 	/**
 	 * Constructs a new displayable binary tree, set to default to the given
 	 * window size for display..
@@ -412,9 +416,4 @@ public class DisplayableBinaryTree extends JComponent {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	public static void show(EditTree tree) {
-		DisplayableBinaryTree x = new DisplayableBinaryTree(tree, 960, 1080, true);
-		x.show();
-	}
 }

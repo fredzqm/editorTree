@@ -142,7 +142,6 @@ public class EditTreeMilestone1Test {
 		assertEquals("abc", t.toString());
 		assertEquals("[b1=, a0=, c0=]", t.toDebugString());
 		assertEquals(1, t.height());
-
 		m1points += m1weight;
 	}
 
