@@ -67,8 +67,8 @@ public class EditTree {
 		} else {
 			b = Code.LEFT;
 		}
-		return new Node(string.charAt(mid), constructFromString(string, start,
-				mid), constructFromString(string, mid + 1, end), mid - start, b);
+		return new Node(string.charAt(mid), constructFromString(string, start, mid),
+				constructFromString(string, mid + 1, end), b);
 	}
 
 	/**
@@ -235,15 +235,6 @@ public class EditTree {
 		root = root.addEnd(c, a);
 		totalRotationCount += a.rotate;
 		check();
-		// Notes:
-		// 1. Please document chunks of code as you go. Why are you doing what
-		// you are doing? Comments written after the code is finalized tend to
-		// be useless, since they just say WHAT the code does, line by line,
-		// rather than WHY the code was written like that. Six months from now,
-		// it's the reasoning behind doing what you did that will be valuable to
-		// you!
-		// 2. Unit tests are cumulative, and many things are based on add(), so
-		// make sure that you get this one correct.
 	}
 
 	/**
@@ -257,7 +248,7 @@ public class EditTree {
 	 *             id pos is negative or too large for this tree
 	 */
 	public void add(char c, int pos) throws IndexOutOfBoundsException {
-		if (pos < 0)
+		if (pos < 0 || pos > root.size())
 			throw new IndexOutOfBoundsException();
 		H a = new H();
 		root = root.add(c, pos, a);
@@ -274,7 +265,7 @@ public class EditTree {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public char delete(int pos) throws IndexOutOfBoundsException {
-		if (pos < 0)
+		if (pos < 0 || pos >= root.size())
 			throw new IndexOutOfBoundsException();
 		H a = new H();
 		root = root.delete(pos, a);
@@ -304,12 +295,10 @@ public class EditTree {
 	 *             unless both start and start+length-1 are in range for this
 	 *             tree.
 	 */
-	public EditTree delete(int start, int length)
-			throws IndexOutOfBoundsException {
+	public EditTree delete(int start, int length) throws IndexOutOfBoundsException {
 		if (start < 0 || start + length >= this.size())
 			throw new IndexOutOfBoundsException(
-					(start < 0) ? "negative first argument to delete"
-							: "delete range extends past end of string");
+					(start < 0) ? "negative first argument to delete" : "delete range extends past end of string");
 		EditTree t2 = this.split(start);
 		EditTree t3 = t2.split(length);
 		this.concatenate(t3);
@@ -366,8 +355,7 @@ public class EditTree {
 					a.edited = false;
 				else
 					height--;
-				root = other.root.concatLeft(a, root, heightOther - height,
-						root.size());
+				root = other.root.concatLeft(a, root, heightOther - height);
 			}
 		}
 		totalRotationCount += a.rotate + other.totalRotationCount;
@@ -387,7 +375,7 @@ public class EditTree {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public EditTree split(int pos) throws IndexOutOfBoundsException {
-		if (pos < 0)
+		if (pos < 0 || pos >= root.size())
 			throw new IndexOutOfBoundsException();
 		EditTree spl = new EditTree();
 		H a = new H();
@@ -454,7 +442,7 @@ public class EditTree {
 	 * 
 	 */
 	public void check() {
-		if (root.rank < 1000)
+		if (root.getRank() < 1000)
 			root.check();
 	}
 

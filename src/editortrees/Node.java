@@ -73,7 +73,7 @@ public class Node {
 	protected char element;
 	public Node left; // subtrees
 	public Node right;
-	protected int rank; // inorder position of this node within its own subtree.
+	protected int size; // inorder position of this node within its own subtree.
 	protected Code balance;
 
 	// Node parent; // You may want this field.
@@ -84,6 +84,10 @@ public class Node {
 	// For the following methods, you should fill in the details so that they
 	// work correctly
 
+	protected int getRank() {
+		return left.size;
+	}
+
 	/**
 	 * construct a leave with given element.
 	 * 
@@ -93,7 +97,7 @@ public class Node {
 		element = c;
 		left = NULL_NODE;
 		right = NULL_NODE;
-		rank = 0;
+		size = 1;
 		balance = Code.SAME;
 	}
 
@@ -107,11 +111,11 @@ public class Node {
 	 * @param rank
 	 * @param balance
 	 */
-	public Node(char element, Node left, Node right, int rank, Code balance) {
+	public Node(char element, Node left, Node right, Code balance) {
 		this.element = element;
 		this.left = left;
 		this.right = right;
-		this.rank = rank;
+		this.size = this.left.size + this.right.size + 1;
 		this.balance = balance;
 	}
 
@@ -122,8 +126,7 @@ public class Node {
 	 * @return the root node
 	 */
 	public Node constructFromTree() {
-		return new Node(element, left.constructFromTree(),
-				right.constructFromTree(), rank, balance);
+		return new Node(element, left.constructFromTree(), right.constructFromTree(), balance);
 	}
 
 	@Override
@@ -132,8 +135,7 @@ public class Node {
 	}
 
 	public String toDebugString() {
-		return "" + element + rank + balance + ", " + left.toDebugString()
-				+ right.toDebugString();
+		return "" + element + getRank() + balance + ", " + left.toDebugString() + right.toDebugString();
 	}
 
 	public int height() {
@@ -143,7 +145,7 @@ public class Node {
 	}
 
 	public int size() {
-		return rank + 1 + right.size();
+		return size;
 	}
 
 	/**
@@ -155,12 +157,12 @@ public class Node {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public char get(int pos) throws IndexOutOfBoundsException {
-		if (pos == rank) {
+		if (pos == getRank()) {
 			return element;
-		} else if (pos <= rank) {
+		} else if (pos <= getRank()) {
 			return left.get(pos);
 		}
-		return right.get(pos - rank - 1);
+		return right.get(pos - getRank() - 1);
 	}
 
 	/**
@@ -175,22 +177,22 @@ public class Node {
 		if (start == end) {
 			return;
 		}
-		if (end <= rank) {
+		if (end <= getRank()) {
 			// If current node is after the sought string, only call get() in
 			// the left subtree.
 			left.get(start, end, sb);
-		} else if (start <= rank & rank < end) {
+		} else if (start <= getRank() & getRank() < end) {
 			// If current node is inside the sought, call get() in both subtrees
-			if (start < rank)
-				left.get(start, rank, sb);
+			if (start < getRank())
+				left.get(start, getRank(), sb);
 			sb.append(element);
-			if (rank + 1 < end)
-				right.get(0, end - rank - 1, sb);
+			if (getRank() + 1 < end)
+				right.get(0, end - getRank() - 1, sb);
 		}
-		if (rank < start) {
+		if (getRank() < start) {
 			// If current node is before the sought string, only call get() in
 			// the right subtree.
-			right.get(start - rank - 1, end - rank - 1, sb);
+			right.get(start - getRank() - 1, end - getRank() - 1, sb);
 		}
 	}
 
@@ -218,7 +220,7 @@ public class Node {
 			if (s.charAt(index) == element) {
 				found.set(i, index + 1);
 				if (index + 1 == s.length())
-					return rank;
+					return getRank();
 				i++;
 			} else {
 				found.remove(i);
@@ -228,7 +230,7 @@ public class Node {
 		if (element == s.charAt(0)) {
 			found.add(1);
 			if (s.length() == 1) {
-				return rank;
+				return getRank();
 			}
 		}
 
@@ -236,7 +238,7 @@ public class Node {
 		int r = right.find(s, found);
 		if (r == -1)
 			return -1;
-		return rank + 1 + r;
+		return getRank() + 1 + r;
 	}
 
 	/**
@@ -252,19 +254,19 @@ public class Node {
 	 * @return
 	 */
 	public int find(String s, int pos, ArrayList<Integer> found) {
-		if (pos < rank) {
+		if (pos < getRank()) {
 			int l = left.find(s, pos, found);
 			if (l != -1)
 				return l;
 		}
-		if (pos <= rank) {
+		if (pos <= getRank()) {
 			int i = 0;
 			while (i < found.size()) {
 				int index = found.get(i);
 				if (s.charAt(index) == element) {
 					found.set(i, index + 1);
 					if (index + 1 == s.length())
-						return rank;
+						return getRank();
 					i++;
 				} else {
 					found.remove(i);
@@ -273,15 +275,15 @@ public class Node {
 			if (element == s.charAt(0)) {
 				found.add(1);
 				if (s.length() == 1) {
-					return rank;
+					return getRank();
 				}
 			}
 			int r = right.find(s, found);
 			if (r == -1)
 				return -1;
-			return rank + 1 + r;
+			return getRank() + 1 + r;
 		}
-		return rank + 1 + right.find(s, pos - rank - 1, found);
+		return getRank() + 1 + right.find(s, pos - getRank() - 1, found);
 	}
 
 	/**
@@ -292,6 +294,7 @@ public class Node {
 	 * @return updated subtree root node
 	 */
 	public Node addEnd(char c, H a) {
+		size++;
 		right = right.addEnd(c, a);
 		if (a.edited) {
 			// it will do nothing if it has been edited before.
@@ -323,14 +326,14 @@ public class Node {
 	 */
 	public Node add(char c, int pos, H a) throws IndexOutOfBoundsException {
 		Code from;
-		if (pos <= rank) {
+		size++;
+		if (pos <= getRank()) {
 			// If pos equals rank, it will just add c to the end of left
 			// subtree.
-			rank++;
 			left = left.add(c, pos, a);
 			from = Code.LEFT;
 		} else {
-			right = right.add(c, pos - rank - 1, a);
+			right = right.add(c, pos - getRank() - 1, a);
 			from = Code.RIGHT;
 		}
 		if (a.edited) {
@@ -431,8 +434,9 @@ public class Node {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public Node delete(int pos, H a) throws IndexOutOfBoundsException {
+		size--;
 		Code from = null;
-		if (rank == pos) {
+		if (getRank() == pos) {
 			// found the node we want to delete
 			a.deleted = element;
 			if (left == NULL_NODE && right == NULL_NODE) {
@@ -452,15 +456,14 @@ public class Node {
 			element = a.glue;
 			// a.edited would only be false if this delection change the height
 			// of
-		} else if (pos < rank) {
+		} else if (pos < getRank()) {
 			// delete node from left
-			rank--;
 			from = Code.LEFT;
 			left = left.delete(pos, a);
 		} else {
 			// delete node from right
 			from = Code.RIGHT;
-			right = right.delete(pos - rank - 1, a);
+			right = right.delete(pos - getRank() - 1, a);
 		}
 
 		if (a.edited) {
@@ -501,7 +504,7 @@ public class Node {
 			a.glue = element;
 			return right;
 		}
-		rank--;
+		size--;
 		left = left.deleteSmallest(a);
 		// balance the tree
 		if (a.edited) {
@@ -638,10 +641,11 @@ public class Node {
 	public Node concatRight(H a, Node inserted, int heightDiff) {
 		if (heightDiff == 0) {
 			// when
-			return new Node(a.glue, this, inserted, size(), Code.SAME);
+			return new Node(a.glue, this, inserted, Code.SAME);
 		} else if (heightDiff == 1) {
-			return new Node(a.glue, this, inserted, size(), Code.LEFT);
+			return new Node(a.glue, this, inserted, Code.LEFT);
 		} else {
+			this.size += inserted.size + 1;
 			if (balance == Code.LEFT)
 				right = right.concatRight(a, inserted, heightDiff - 2);
 			else
@@ -674,20 +678,20 @@ public class Node {
 	 *            the size of inserted subtree
 	 * @return the updated root node
 	 */
-	public Node concatLeft(H a, Node inserted, int heightDiff, int insertSize) {
+	public Node concatLeft(H a, Node inserted, int heightDiff) {
 		if (heightDiff < 0) {
 			throw new RuntimeException("" + heightDiff);
 		}
 		if (heightDiff == 0) {
-			return new Node(a.glue, inserted, this, insertSize, Code.SAME);
+			return new Node(a.glue, inserted, this, Code.SAME);
 		} else if (heightDiff == 1) {
-			return new Node(a.glue, inserted, this, insertSize, Code.RIGHT);
+			return new Node(a.glue, inserted, this, Code.RIGHT);
 		} else {
-			rank += insertSize + 1;
+			size += inserted.size + 1;
 			if (balance == Code.RIGHT)
-				left = left.concatLeft(a, inserted, heightDiff - 2, insertSize);
+				left = left.concatLeft(a, inserted, heightDiff - 2);
 			else
-				left = left.concatLeft(a, inserted, heightDiff - 1, insertSize);
+				left = left.concatLeft(a, inserted, heightDiff - 1);
 		}
 		if (a.edited) {
 		} else if (balance == Code.SAME) {
@@ -716,11 +720,11 @@ public class Node {
 	 * @return root node of the left splited tree
 	 */
 	public Node split(int pos, H a, EditTree spl, H b) {
-		if (pos == rank || pos == rank + 1) {
+		if (pos == getRank() || pos == getRank() + 1) {
 			// basis case when we can cut this subtree besides the node
 			Node l = left;
 			spl.setRoot(right);
-			if (pos == rank) {
+			if (pos == getRank()) {
 				spl.setRoot(spl.getRoot().add(element, 0, b));
 				updateHdiff(b);
 			} else {
@@ -730,13 +734,12 @@ public class Node {
 			synHdiff(a, b);
 			return l;
 		}
-		if (pos < rank) {
+		if (pos < getRank()) {
 			Node l = left.split(pos, a, spl, b);
 			b.hdiff += balance.hdiff();
 			b.glue = element;
 			if (b.hdiff >= 0) {
-				spl.setRoot(right.concatLeft(b, spl.getRoot(), b.hdiff, spl
-						.getRoot().size()));
+				spl.setRoot(right.concatLeft(b, spl.getRoot(), b.hdiff));
 				updateHdiff(b);
 			} else {
 				spl.setRoot(spl.getRoot().concatRight(b, right, -b.hdiff));
@@ -747,14 +750,14 @@ public class Node {
 			synHdiff(a, b);
 			return l;
 		} else {
-			Node l = right.split(pos - rank - 1, a, spl, b);
+			Node l = right.split(pos - getRank() - 1, a, spl, b);
 			a.hdiff -= balance.hdiff();
 			a.glue = element;
 			if (a.hdiff >= 0) {
 				l = left.concatRight(a, l, a.hdiff);
 				updateHdiff(a);
 			} else {
-				l = l.concatLeft(a, left, -a.hdiff, left.size());
+				l = l.concatLeft(a, left, -a.hdiff);
 				updateHdiff(a);
 				a.hdiff--;
 			}
@@ -813,7 +816,8 @@ public class Node {
 			balance = Code.SAME;
 			right.balance = Code.SAME;
 		}
-		right.rank += rank + 1;
+		right.size = this.size;
+		this.size = right.left.size + left.size + 1;
 		Node rl = right.left;
 		right.left = this;
 		Node r = right;
@@ -840,7 +844,8 @@ public class Node {
 			balance = Code.SAME;
 			left.balance = Code.SAME;
 		}
-		rank -= left.rank + 1;
+		left.size = this.size;
+		this.size = left.right.size + right.size + 1;
 		Node lf = left.right;
 		left.right = this;
 		Node l = left;
@@ -859,6 +864,7 @@ public class Node {
 			super('\n');
 			left = this;
 			right = this;
+			size = 0;
 		}
 
 		@Override
@@ -904,7 +910,7 @@ public class Node {
 		@Override
 		public Node add(char c, int pos, EditTree.H edit) {
 			if (pos > 0)
-				throw new IndexOutOfBoundsException();
+				throw new RuntimeException();
 			return new Node(c);
 		}
 
@@ -915,7 +921,7 @@ public class Node {
 
 		@Override
 		public Node delete(int pos, H a) throws IndexOutOfBoundsException {
-			throw new IndexOutOfBoundsException();
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -934,14 +940,13 @@ public class Node {
 		}
 
 		@Override
-		public Node concatLeft(H a, Node inserted, int heightDiff,
-				int insertSize) {
+		public Node concatLeft(H a, Node inserted, int heightDiff) {
 			throw new RuntimeException();
 		}
 
 		@Override
 		public Node split(int pos, H a, EditTree spl, H b) {
-			throw new IndexOutOfBoundsException();
+			throw new RuntimeException();
 		}
 
 		@Override
@@ -967,9 +972,9 @@ public class Node {
 	 *
 	 */
 	public void check() {
-		int s = left.slowSize();
-		if (rank != s)
-			throw new RuntimeException("rank: " + s + " " + rank);
+		int s = slowSize();
+		if (s != size)
+			throw new RuntimeException("size: " + s + " " + size);
 		int l = left.slowHeight();
 		int r = right.slowHeight();
 		switch (balance) {
