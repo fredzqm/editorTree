@@ -390,20 +390,17 @@ public class EditTree {
 		public boolean treeBalanced;
 
 		/**
-		 * store the element deleted from the tree
-		 */
-		public char deleted;
-		
-		/**
 		 * store element that was removed some leave and will be used to help
 		 * glue two subtree together.
 		 */
-		public char glue;
+		public char deleted;
+		
 		/**
 		 * keep track of the number of rotation happened during the modification
 		 * operation
 		 */
 		public int rotate;
+		
 		/**
 		 * store the height differernce compared to a certain subtree in split
 		 * method
@@ -413,7 +410,6 @@ public class EditTree {
 		public H() {
 			treeBalanced = false;
 			deleted = '\n';
-			glue = '\n';
 			rotate = 0;
 			hdiff = 1;
 		}

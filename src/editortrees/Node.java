@@ -478,7 +478,9 @@ public class Node {
 			}
 			from = Code.RIGHT;
 			right = right.deleteSmallest(a);
-			element = a.glue;
+			char x = element;
+			element = a.deleted;
+			a.deleted = x;
 		} else if (pos < getRank()) {
 			from = Code.LEFT;
 			left = left.delete(pos, a);
@@ -509,7 +511,7 @@ public class Node {
 	 */
 	public Node deleteSmallest(H a) throws IndexOutOfBoundsException {
 		if (left == NULL_NODE) {
-			a.glue = element;
+			a.deleted = element;
 			return right;
 		}
 		size--;
@@ -544,7 +546,7 @@ public class Node {
 	 */
 	public Node deleteBiggest(H a) {
 		if (right == NULL_NODE) {
-			a.glue = element;
+			a.deleted = element;
 			return left;
 		}
 		size--;
@@ -634,9 +636,9 @@ public class Node {
 			throw new RuntimeException();
 		if (heightDiff == 0) {
 			// when
-			return new Node(a.glue, this, inserted, Code.SAME);
+			return new Node(a.deleted, this, inserted, Code.SAME);
 		} else if (heightDiff == 1) {
-			return new Node(a.glue, this, inserted, Code.LEFT);
+			return new Node(a.deleted, this, inserted, Code.LEFT);
 		} else {
 			this.size += inserted.size + 1;
 			if (balance == Code.LEFT)
@@ -678,9 +680,9 @@ public class Node {
 			throw new RuntimeException("" + heightDiff);
 		}
 		if (heightDiff == 0) {
-			return new Node(a.glue, inserted, this, Code.SAME);
+			return new Node(a.deleted, inserted, this, Code.SAME);
 		} else if (heightDiff == 1) {
-			return new Node(a.glue, inserted, this, Code.RIGHT);
+			return new Node(a.deleted, inserted, this, Code.RIGHT);
 		} else {
 			size += inserted.size + 1;
 			if (balance == Code.RIGHT)
@@ -734,7 +736,7 @@ public class Node {
 		if (pos < getRank()) {
 			Node l = left.split(pos, a, spl, b);
 			b.hdiff += balance.hdiff();
-			b.glue = element;
+			b.deleted = element;
 			if (b.hdiff >= 0) {
 				spl.setRoot(right.concatLeft(b, spl.getRoot(), b.hdiff));
 				updateHdiff(b);
@@ -749,7 +751,7 @@ public class Node {
 		} else {
 			Node l = right.split(pos - getRank() - 1, a, spl, b);
 			a.hdiff -= balance.hdiff();
-			a.glue = element;
+			a.deleted = element;
 			if (a.hdiff >= 0) {
 				l = left.concatRight(a, l, a.hdiff);
 				updateHdiff(a);
