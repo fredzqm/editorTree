@@ -1,6 +1,9 @@
 package editortrees;
 
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.Stack;
 
 import editortrees.Node.Code;
 
@@ -429,4 +432,42 @@ public class EditTree {
 		public int size;
 	}
 	
+	public Iterator<Node> nodeIterator() {
+		return new InOrderIterator(root);
+	}
+	
+	static class InOrderIterator implements Iterator<Node> {
+		Stack<Node> stack;
+		Node current;
+
+		public InOrderIterator(Node root) {
+			stack = new Stack<Node>();
+			current = root;
+			while (current != Node.NULL_NODE) {
+				stack.push(current);
+				current = current.getLeft();
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return !stack.isEmpty();
+		}
+
+		@Override
+		public Node next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			current = stack.pop();
+			Node next = current.getRight();
+			while (next != Node.NULL_NODE) {
+				stack.push(next);
+				next = next.getLeft();
+			}
+			return current;
+		}
+
+	}
+
 }
