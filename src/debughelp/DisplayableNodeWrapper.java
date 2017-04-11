@@ -5,9 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
 
-import editortrees.EditTree;
 import editortrees.Node;
 
 /*
@@ -28,19 +26,25 @@ public class DisplayableNodeWrapper {
 
 	// ******************************************************************************
 
-	private EditTree tree;
 	private Node node;
+	private DisplayableNodeWrapper parent, left, right;
 
 	/**
 	 * only sets the graphical related fields
 	 * 
 	 * @param node
 	 */
-	public DisplayableNodeWrapper(EditTree tree, Node node) {
-		this.tree = tree;
+	public DisplayableNodeWrapper(DisplayableNodeWrapper parent, Node node) {
 		this.point = null;
 		this.radius = -10;
 		this.node = node;
+		this.parent = parent;
+		if (this.node.getLeft() != Node.NULL_NODE) {
+			this.left = new DisplayableNodeWrapper(this, node.getLeft());
+		}
+		if (this.node.getRight() != Node.NULL_NODE) {
+			this.right = new DisplayableNodeWrapper(this, node.getRight());
+		}
 	}
 
 	/**
@@ -49,10 +53,7 @@ public class DisplayableNodeWrapper {
 	 * @return
 	 */
 	public DisplayableNodeWrapper getLeft() {
-		if (this.node.getLeft() != Node.NULL_NODE) {
-			return new DisplayableNodeWrapper(tree, node.getLeft());
-		}
-		return null;
+		return left;
 	}
 
 	/**
@@ -61,10 +62,7 @@ public class DisplayableNodeWrapper {
 	 * @return
 	 */
 	public DisplayableNodeWrapper getRight() {
-		if (this.node.getRight() != Node.NULL_NODE) {
-			return new DisplayableNodeWrapper(tree, node.getRight());
-		}
-		return null;
+		return right;
 	}
 
 	/**
@@ -73,15 +71,7 @@ public class DisplayableNodeWrapper {
 	 * @return
 	 */
 	public DisplayableNodeWrapper getParent() {
-		Iterator<Node> itr = tree.nodeIterator();
-		while (itr.hasNext()) {
-			Node n = itr.next();
-			if (n.getLeft() == this.node)
-				return new DisplayableNodeWrapper(tree, n);
-			if (n.getRight() == this.node)
-				return new DisplayableNodeWrapper(tree, n);
-		}
-		return null;
+		return parent;
 	}
 
 	public Node getNode() {

@@ -219,7 +219,7 @@ public class DisplayableBinaryTree extends JComponent {
 		g2.fill(new Rectangle2D.Double(this.width - 20, 80, 40, 5));
 		g2.fill(new Rectangle2D.Double(this.width - 25, 90, 50, 5));
 		// // RAISE THE BAR ^^^^^
-		DisplayableNodeWrapper current = new DisplayableNodeWrapper(this.tree, this.tree.getRoot());
+		DisplayableNodeWrapper current = new DisplayableNodeWrapper(null, this.tree.getRoot());
 		// CURRENT.POINT = THE CENTER POINT, NOT THE UPPER LEFT CORNER
 		this.paintHelper(g2, current, this.nodeY);
 		this.lineHelper(g2, current);
@@ -412,6 +412,7 @@ public class DisplayableBinaryTree extends JComponent {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static void show(EditTree tree) {
 		DisplayableBinaryTree x = new DisplayableBinaryTree(tree, 960, 1080, true);
 		x.show();
