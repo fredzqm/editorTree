@@ -5,16 +5,18 @@ import java.util.ListIterator;
 
 import editortrees.EditTree.H;
 
-// A node in a height-balanced binary tree with rank.
-// Except for the NULL_NODE (if you choose to use one), one node cannot
-// belong to two different trees.
-
+/**
+ * A node in AVL tree
+ * 
+ * @author zhang
+ *
+ */
 public class Node {
 	public static final Node NULL_NODE = new Null_Node();
 
 	public enum Code {
 		SAME, LEFT, RIGHT;
-		// Used in the displayer and debug string
+		
 		@Override
 		public String toString() {
 			switch (this) {
@@ -66,42 +68,19 @@ public class Node {
 		}
 	}
 
-	// The fields would normally be private, but for the purposes of this class,
-	// we want to be able to test the results of the algorithms in addition to
-	// the
-	// "publicly visible" effects
-
 	protected char element;
-	public Node left; // subtrees
+	public Node left;
 	public Node right;
-	protected int size; // inorder position of this node within its own subtree.
+	protected int size;
 	protected Code balance;
-
-	// Node parent; // You may want this field.
-	// Feel free to add other fields that you find useful
-
-	// You will probably want to add several other methods
-
-	// For the following methods, you should fill in the details so that they
-	// work correctly
 
 	protected int getRank() {
 		return left.size;
 	}
 
-	/**
-	 * construct a leave with given element.
-	 * 
-	 * @param c
-	 */
-	public Node(char c) {
-		element = c;
-		left = NULL_NODE;
-		right = NULL_NODE;
-		size = 1;
-		balance = Code.SAME;
+	public Node() {
 	}
-
+	
 	/**
 	 * 
 	 * construct a node given all of its data
@@ -118,6 +97,15 @@ public class Node {
 		this.right = right;
 		this.size = this.left.size + this.right.size + 1;
 		this.balance = balance;
+	}
+
+	/**
+	 * construct a leave with given element.
+	 * 
+	 * @param c
+	 */
+	public Node(char c) {
+		this(c, NULL_NODE, NULL_NODE, Code.SAME);
 	}
 
 	/**
@@ -822,7 +810,7 @@ public class Node {
 	 */
 	static class Null_Node extends Node {
 		public Null_Node() {
-			super('\n');
+			super();
 			left = this;
 			right = this;
 			size = 0;
