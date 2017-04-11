@@ -477,7 +477,7 @@ public class Node {
 				return left;
 			}
 			from = Code.RIGHT;
-			right = right.deleteSmallest(a);
+			right = right.delete(0, a);
 			char x = element;
 			element = a.deleted;
 			a.deleted = x;
@@ -500,29 +500,6 @@ public class Node {
 		}
 	}
 
-	/**
-	 * delete the left most node in this subtree, stores its value in a.glue and
-	 * then return the updated node
-	 * 
-	 * @param a
-	 *            helper class
-	 * @return updated node
-	 * @throws IndexOutOfBoundsException
-	 */
-	public Node deleteSmallest(H a) throws IndexOutOfBoundsException {
-		if (left == NULL_NODE) {
-			a.deleted = element;
-			return right;
-		}
-		size--;
-		left = left.deleteSmallest(a);
-		if (a.treeBalanced) {
-			// Tree is already balanced
-			return this;
-		}
-		return deleteFromLeft(a);
-	}
-
 	private Node deleteFromLeft(H a) {
 		if (balance == Code.SAME) {
 			a.treeBalanced = true;
@@ -533,29 +510,6 @@ public class Node {
 			return deleteRotateFromLeft(a);
 		}
 		return this;
-	}
-
-	/**
-	 * delete the left most node in this subtree, stores its value in a.glue and
-	 * then return the updated node
-	 * 
-	 *
-	 * @param a
-	 *            helper class
-	 * @return updated node
-	 */
-	public Node deleteBiggest(H a) {
-		if (right == NULL_NODE) {
-			a.deleted = element;
-			return left;
-		}
-		size--;
-		right = right.deleteBiggest(a);
-		if (a.treeBalanced) {
-			// Tree is already balanced
-			return this;
-		}
-		return deleteFromRight(a);
 	}
 
 	private Node deleteFromRight(H a) {

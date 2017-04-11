@@ -317,7 +317,7 @@ public class EditTree {
 				// remove the glue, other tree is empty
 				root = root.addEnd(other.root.element, a);
 			} else {
-				other.root = other.root.deleteSmallest(a);
+				other.root = other.root.delete(0, a);
 				if (a.treeBalanced)
 					a.treeBalanced = false;
 				else
@@ -336,7 +336,7 @@ public class EditTree {
 				// remove the glue, this tree is empty
 				root = other.root.add(root.element, 0, a);
 			} else {
-				root = root.deleteBiggest(a);
+				root = root.delete(root.size - 1, a);
 				if (a.treeBalanced)
 					a.treeBalanced = false;
 				else
