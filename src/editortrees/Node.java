@@ -266,32 +266,31 @@ public class Node {
 				throw new RuntimeException();
 			return new Node(c);
 		}
-		Code from;
 		size++;
 		if (pos <= getRank()) {
 			left = left.add(c, pos, a);
-			from = Code.LEFT;
+			if (a.treeBalanced)
+				return this;
+			if (getBalance() == Code.SAME) {
+				return updateBalanceCode(null, Code.LEFT, null);
+			} else if (getBalance() != Code.LEFT) {
+				a.treeBalanced = true;
+				return updateBalanceCode(null, Code.SAME, null);
+			} else {
+				return addRotateFromLeft(a);
+			}
 		} else {
 			right = right.add(c, pos - getRank() - 1, a);
-			from = Code.RIGHT;
-		}
-		if (a.treeBalanced)
-			return this;
-		if (getBalance() == Code.SAME) {
-			// keep searching unbalanced node
-			return updateBalanceCode(null, from, null);
-		} else if (getBalance() != from) {
-			// finish searching unbalanced node
-			a.treeBalanced = true;
-			return updateBalanceCode(null, Code.SAME, null);
-		} else {
-			// fixed unbalanced node
-			if (from == Code.LEFT) {
-				return addRotateFromLeft(a);
-			} else if (from == Code.RIGHT) {
+			if (a.treeBalanced)
+				return this;
+			if (getBalance() == Code.SAME) {
+				return updateBalanceCode(null, Code.RIGHT, null);
+			} else if (getBalance() != Code.RIGHT) {
+				a.treeBalanced = true;
+				return updateBalanceCode(null, Code.SAME, null);
+			} else {
 				return addRotateFromRight(a);
 			}
-			throw new RuntimeException();
 		}
 	}
 
