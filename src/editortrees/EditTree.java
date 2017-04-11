@@ -421,25 +421,12 @@ public class EditTree {
 	 */
 	public void check() {
 		if (root.size() < 1000)
-			root.check();
+			root.check(new X());
 	}
 
-	/**
-	 * a height method that is never wrong
-	 * 
-	 * @return height of tree
-	 */
-	public int slowHeight() {
-		return root.slowHeight();
+	public static class X {
+		public int height;
+		public int size;
 	}
-
-	/**
-	 * a size method that is never wrong
-	 * 
-	 * @return size of tree
-	 */
-	public int slowSize() {
-		return root.slowSize();
-	}
-
+	
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import editortrees.EditTree.H;
+import editortrees.EditTree.X;
 
 /**
  * A node in AVL tree
@@ -28,23 +29,6 @@ public class Node {
 				return "\\";
 			default:
 				throw new IllegalStateException();
-			}
-		}
-
-		/**
-		 * 
-		 * @return the inverse direction
-		 */
-		public Code inverse() {
-			switch (this) {
-			case SAME:
-				return SAME;
-			case RIGHT:
-				return LEFT;
-			case LEFT:
-				return RIGHT;
-			default:
-				throw new RuntimeException();
 			}
 		}
 
@@ -174,11 +158,8 @@ public class Node {
 			return;
 		}
 		if (end <= getRank()) {
-			// If current node is after the sought string, only call get() in
-			// the left subtree.
 			left.get(start, end, sb);
 		} else if (start <= getRank() & getRank() < end) {
-			// If current node is inside the sought, call get() in both subtrees
 			if (start < getRank())
 				left.get(start, getRank(), sb);
 			sb.append(element);
@@ -186,8 +167,6 @@ public class Node {
 				right.get(0, end - getRank() - 1, sb);
 		}
 		if (getRank() < start) {
-			// If current node is before the sought string, only call get() in
-			// the right subtree.
 			right.get(start - getRank() - 1, end - getRank() - 1, sb);
 		}
 	}
@@ -217,8 +196,7 @@ public class Node {
 		}
 		if (pos <= getRank()) {
 			// updating the matching indexes in the array list, return the index
-			// of
-			// last character.
+			// of the last character.
 			ListIterator<Integer> itr = found.listIterator();
 			while (itr.hasNext()) {
 				int index = itr.next();
@@ -266,8 +244,6 @@ public class Node {
 		Code from;
 		size++;
 		if (pos <= getRank()) {
-			// If pos equals rank, it will just add c to the end of left
-			// subtree.
 			left = left.add(c, pos, a);
 			from = Code.LEFT;
 		} else {
@@ -543,7 +519,6 @@ public class Node {
 		if (this == NULL_NODE)
 			throw new RuntimeException();
 		if (heightDiff == 0) {
-			// when
 			return new Node(a.deleted, this, inserted, Code.SAME);
 		} else if (heightDiff == 1) {
 			return new Node(a.deleted, this, inserted, Code.LEFT);
@@ -554,8 +529,9 @@ public class Node {
 			else
 				right = right.concatRight(a, inserted, heightDiff - 1);
 		}
-		if (a.treeBalanced) {
-		} else if (balance == Code.SAME) {
+		if (a.treeBalanced)
+			return this;
+		if (balance == Code.SAME) {
 			balance = Code.RIGHT;
 		} else if (balance == Code.LEFT) {
 			a.treeBalanced = true;
@@ -598,8 +574,9 @@ public class Node {
 			else
 				left = left.concatLeft(a, inserted, heightDiff - 1);
 		}
-		if (a.treeBalanced) {
-		} else if (balance == Code.SAME) {
+		if (a.treeBalanced)
+			return this;
+		if (balance == Code.SAME) {
 			balance = Code.LEFT;
 		} else if (balance == Code.RIGHT) {
 			a.treeBalanced = true;
@@ -707,58 +684,33 @@ public class Node {
 	/**
 	 * check whether this node has correct rank, balance code, whether NULL_NODE
 	 * stays the same.
-	 *
+	 * 
+	 * @param x
 	 */
-	public void check() {
+	public void check(X x) {
 		if (this == NULL_NODE) {
 			if (left != null || right != null || size != 0 || balance != null || element != 0)
 				throw new RuntimeException("NULL_NODE changed!");
+			x.height = -1;
+			x.size = 0;
 			return;
 		}
-		int s = slowSize();
-		if (s != size)
-			throw new RuntimeException("size: " + s + " " + size);
-		int l = left.slowHeight();
-		int r = right.slowHeight();
-		switch (balance) {
-		case SAME:
-			if (l != r)
-				throw new RuntimeException("same: " + l + " " + r);
-			break;
-		case LEFT:
-			if (l != r + 1)
-				throw new RuntimeException("left: " + l + " " + r);
-			break;
-		case RIGHT:
-			if (l + 1 != r)
-				throw new RuntimeException("right: " + l + " " + r);
-			break;
-		default:
-		}
-		left.check();
-		right.check();
-	}
+		left.check(x);
+		int leftHeight = x.height;
+		int leftSize = x.size;
+		right.check(x);
+		int rightHeight = x.height;
+		int rightSize = x.size;
 
-	/**
-	 * height method that will never be wrong
-	 * 
-	 * @return height
-	 */
-	public int slowHeight() {
-		if (this == NULL_NODE)
-			return -1;
-		return Math.max(left.slowHeight(), right.slowHeight()) + 1;
-	}
+		// check size
+		x.size = leftSize + rightSize + 1;
+		if (x.size != size)
+			throw new RuntimeException("size: " + x.size + " " + size);
 
-	/**
-	 * size method that will never be wrong
-	 *
-	 * @return size
-	 */
-	public int slowSize() {
-		if (this == NULL_NODE)
-			return 0;
-		return left.slowSize() + 1 + right.slowSize();
+		// check balanced code
+		x.height = Math.max(leftHeight, rightHeight) + 1;
+		if (rightHeight - leftHeight != balance.hdiff())
+			throw new RuntimeException("same: " + leftHeight + " " + rightHeight);
 	}
 
 }
