@@ -58,7 +58,7 @@ public class Node {
 	private int size;
 	private Code balance;
 
-	private int getRank() {
+	public int getRank() {
 		return left.size;
 	}
 
@@ -117,15 +117,19 @@ public class Node {
 		return "" + getElement() + getRank() + balance + ", " + left.toDebugString() + right.toDebugString();
 	}
 
+	public Code getBalance() {
+		return balance;
+	}
+
 	public char getElement() {
 		return element;
 	}
 
-	protected Node getLeft() {
+	public Node getLeft() {
 		return left;
 	}
 
-	protected Node getRight() {
+	public Node getRight() {
 		return right;
 	}
 
