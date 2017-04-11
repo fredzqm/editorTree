@@ -52,13 +52,13 @@ public class Node {
 		}
 	}
 
-	protected char element;
-	public Node left;
-	public Node right;
-	protected int size;
-	protected Code balance;
+	private char element;
+	private Node left;
+	private Node right;
+	private int size;
+	private Code balance;
 
-	protected int getRank() {
+	private int getRank() {
 		return left.size;
 	}
 
@@ -101,20 +101,32 @@ public class Node {
 	public Node constructFromTree() {
 		if (this == NULL_NODE)
 			return NULL_NODE;
-		return new Node(element, left.constructFromTree(), right.constructFromTree(), balance);
+		return new Node(getElement(), left.constructFromTree(), right.constructFromTree(), balance);
 	}
 
 	@Override
 	public String toString() {
 		if (this == NULL_NODE)
 			return "";
-		return left.toString() + element + right.toString();
+		return left.toString() + getElement() + right.toString();
 	}
 
 	public String toDebugString() {
 		if (this == NULL_NODE)
 			return "";
-		return "" + element + getRank() + balance + ", " + left.toDebugString() + right.toDebugString();
+		return "" + getElement() + getRank() + balance + ", " + left.toDebugString() + right.toDebugString();
+	}
+
+	public char getElement() {
+		return element;
+	}
+
+	protected Node getLeft() {
+		return left;
+	}
+
+	protected Node getRight() {
+		return right;
 	}
 
 	public int height() {
@@ -138,7 +150,7 @@ public class Node {
 	 */
 	public char get(int pos) {
 		if (pos == getRank()) {
-			return element;
+			return getElement();
 		} else if (pos <= getRank()) {
 			return left.get(pos);
 		}
@@ -162,7 +174,7 @@ public class Node {
 		} else if (start <= getRank() & getRank() < end) {
 			if (start < getRank())
 				left.get(start, getRank(), sb);
-			sb.append(element);
+			sb.append(getElement());
 			if (getRank() + 1 < end)
 				right.get(0, end - getRank() - 1, sb);
 		}
@@ -200,7 +212,7 @@ public class Node {
 			ListIterator<Integer> itr = found.listIterator();
 			while (itr.hasNext()) {
 				int index = itr.next();
-				if (s.charAt(index) == element) {
+				if (s.charAt(index) == getElement()) {
 					if (index + 1 == s.length())
 						return getRank();
 					itr.set(index + 1);
@@ -209,7 +221,7 @@ public class Node {
 				}
 			}
 			// see if this can be the start of a match.
-			if (element == s.charAt(0)) {
+			if (getElement() == s.charAt(0)) {
 				if (s.length() == 1) {
 					return getRank();
 				}
@@ -420,7 +432,7 @@ public class Node {
 		if (getRank() < pos) {
 			right = right.delete(pos - getRank() - 1, a);
 		} else {
-			a.deleted = element;
+			a.deleted = getElement();
 			if (left == NULL_NODE && right == NULL_NODE) {
 				return NULL_NODE;
 			} else if (left == NULL_NODE) {
@@ -429,9 +441,9 @@ public class Node {
 				return left;
 			}
 			right = right.delete(0, a);
-			char x = element;
-			element = a.deleted;
-			a.deleted = x;
+			char swap = getElement();
+			this.element = a.deleted;
+			a.deleted = swap;
 		}
 		if (a.treeBalanced)
 			return this;
@@ -543,9 +555,9 @@ public class Node {
 	}
 
 	/**
-	 * cancatante this subtree and another smaller subtree with the glue element
-	 * in a.glue on the left side, given the difference between those two
-	 * subtree.
+	 * Concatenate this subtree and another smaller subtree with the glue
+	 * element in a.glue on the left side, given the difference between those
+	 * two subtree.
 	 * 
 	 * @param a
 	 *            helper class
@@ -588,45 +600,45 @@ public class Node {
 	}
 
 	/**
-	 * split this node at given position and stores and merge right subtree in
-	 * spl
+	 * split this node at given position and stores and merge right subtree with
+	 * tree other
 	 * 
 	 * @param pos
 	 *            position to split
 	 * @param a
 	 *            first helper class
-	 * @param spl
-	 *            right subtree to be concanated
+	 * @param other
+	 *            right subtree to be concatenate
 	 * @param b
 	 *            second helper class
-	 * @return root node of the left splited tree
+	 * @return root node of the left spliced tree
 	 */
-	public Node split(int pos, H a, EditTree spl, H b) {
+	public Node split(int pos, H a, EditTree other, H b) {
 		if (this == NULL_NODE)
 			throw new RuntimeException();
 		if (pos == getRank() || pos == getRank() + 1) {
 			// basis case when we can cut this subtree besides the node
 			Node l = left;
-			spl.setRoot(right);
+			other.setRoot(right);
 			if (pos == getRank()) {
-				spl.setRoot(spl.getRoot().add(element, 0, b));
+				other.setRoot(other.getRoot().add(getElement(), 0, b));
 				updateHdiff(b);
 			} else {
-				l = left.add(element, left.size(), a);
+				l = left.add(getElement(), left.size(), a);
 				updateHdiff(a);
 			}
 			synHdiff(a, b);
 			return l;
 		}
 		if (pos < getRank()) {
-			Node l = left.split(pos, a, spl, b);
+			Node l = left.split(pos, a, other, b);
 			b.hdiff += balance.hdiff();
-			b.deleted = element;
+			b.deleted = getElement();
 			if (b.hdiff >= 0) {
-				spl.setRoot(right.concatLeft(b, spl.getRoot(), b.hdiff));
+				other.setRoot(right.concatLeft(b, other.getRoot(), b.hdiff));
 				updateHdiff(b);
 			} else {
-				spl.setRoot(spl.getRoot().concatRight(b, right, -b.hdiff));
+				other.setRoot(other.getRoot().concatRight(b, right, -b.hdiff));
 				updateHdiff(b);
 				b.hdiff--;
 			}
@@ -634,9 +646,9 @@ public class Node {
 			synHdiff(a, b);
 			return l;
 		} else {
-			Node l = right.split(pos - getRank() - 1, a, spl, b);
+			Node l = right.split(pos - getRank() - 1, a, other, b);
 			a.hdiff -= balance.hdiff();
-			a.deleted = element;
+			a.deleted = getElement();
 			if (a.hdiff >= 0) {
 				l = left.concatRight(a, l, a.hdiff);
 				updateHdiff(a);
@@ -689,7 +701,7 @@ public class Node {
 	 */
 	public void check(X x) {
 		if (this == NULL_NODE) {
-			if (left != null || right != null || size != 0 || balance != null || element != 0)
+			if (left != null || right != null || size != 0 || balance != null || getElement() != 0)
 				throw new RuntimeException("NULL_NODE changed!");
 			x.height = -1;
 			x.size = 0;

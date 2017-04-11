@@ -2611,8 +2611,8 @@ public class EditTreeMilestone3Test {
 		Node t3root = t3.getRoot();
 		Node t3originalRoot = t3s.getRoot();
 		assertFalse(t3root == t3originalRoot);
-		assertFalse(t3root.left == t3originalRoot.left);
-		assertFalse(t3root.right.left == t3originalRoot.right.left);
+		assertFalse(t3root.getLeft() == t3originalRoot.getLeft());
+		assertFalse(t3root.getRight().getLeft() == t3originalRoot.getRight().getLeft());
 
 		// Test using sizes and heights.
 		assertEquals(t1s.toString(), t1.toString());

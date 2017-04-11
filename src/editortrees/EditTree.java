@@ -311,7 +311,7 @@ public class EditTree {
 			if (heightOther == -1) {
 				return;
 			} else if (heightOther == 0) {
-				root = root.add(other.root.element, root.size(), a);
+				root = root.add(other.root.getElement(), root.size(), a);
 			} else {
 				other.root = other.root.delete(0, a);
 				if (a.treeBalanced)
@@ -327,9 +327,9 @@ public class EditTree {
 				other.root = Node.NULL_NODE;
 				return;
 			} else if (height == 0) {
-				root = other.root.add(root.element, 0, a);
+				root = other.root.add(root.getElement(), 0, a);
 			} else {
-				root = root.delete(root.size - 1, a);
+				root = root.delete(root.size() - 1, a);
 				if (a.treeBalanced)
 					a.treeBalanced = false;
 				else
