@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import editortrees.EditTree.H;
+import editortrees.EditTree.NodeWrapper;
 import editortrees.EditTree.X;
 
 /**
@@ -587,21 +588,21 @@ public class Node {
 	 *            position to split
 	 * @param a
 	 *            first helper class
-	 * @param other
+	 * @param spl
 	 *            right subtree to be concatenate
 	 * @param b
 	 *            second helper class
 	 * @return root node of the left spliced tree
 	 */
-	public Node split(int pos, H a, EditTree other, H b) {
+	public Node split(int pos, H a, NodeWrapper spl, H b) {
 		if (this == NULL_NODE)
 			throw new RuntimeException();
 		if (pos == getRank() || pos == getRank() + 1) {
 			// basis case when we can cut this subtree besides the node
 			Node l = left;
-			other.setRoot(right);
+			spl.root = right;
 			if (pos == getRank()) {
-				other.setRoot(other.getRoot().add(getElement(), 0, b));
+				spl.root = spl.root.add(getElement(), 0, b);
 				updateHdiff(b);
 			} else {
 				l = left.add(getElement(), left.size(), a);
@@ -611,14 +612,14 @@ public class Node {
 			return l;
 		}
 		if (pos < getRank()) {
-			Node l = left.split(pos, a, other, b);
+			Node l = left.split(pos, a, spl, b);
 			b.hdiff += getBalance().hdiff();
 			b.deleted = getElement();
 			if (b.hdiff >= 0) {
-				other.setRoot(right.concatLeft(b, other.getRoot(), b.hdiff));
+				spl.root = right.concatLeft(b, spl.root, b.hdiff);
 				updateHdiff(b);
 			} else {
-				other.setRoot(other.getRoot().concatRight(b, right, -b.hdiff));
+				spl.root = spl.root.concatRight(b, right, -b.hdiff);
 				updateHdiff(b);
 				b.hdiff--;
 			}
@@ -626,7 +627,7 @@ public class Node {
 			synHdiff(a, b);
 			return l;
 		} else {
-			Node l = right.split(pos - getRank() - 1, a, other, b);
+			Node l = right.split(pos - getRank() - 1, a, spl, b);
 			a.hdiff -= getBalance().hdiff();
 			a.deleted = getElement();
 			if (a.hdiff >= 0) {

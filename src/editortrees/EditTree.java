@@ -12,13 +12,14 @@ import editortrees.Node.Code;
 public class EditTree {
 	private Node root;
 	private int totalRotationCount;
-
+	private int height;
+	
 	/**
 	 * Construct an empty tree
 	 */
 	public EditTree() {
 		root = Node.NULL_NODE;
-		totalRotationCount = 0;
+		height = -1;
 	}
 
 	/**
@@ -27,8 +28,8 @@ public class EditTree {
 	 * @param c
 	 */
 	public EditTree(char c) {
-		this();
 		root = new Node(c);
+		height = 0;
 	}
 
 	/**
@@ -39,8 +40,8 @@ public class EditTree {
 	 * @param s
 	 */
 	public EditTree(String s) {
-		this();
 		root = constructFromString(s, 0, s.length());
+		height = root.height();
 		check();
 	}
 
@@ -82,8 +83,13 @@ public class EditTree {
 	 */
 	public EditTree(EditTree e) {
 		root = e.root.constructFromTree();
-		totalRotationCount = 0;
+		height = e.height;
 		check();
+	}
+
+	public EditTree(Node root, int height) {
+		this.root = root;
+		this.height = height;
 	}
 
 	/**
@@ -103,11 +109,7 @@ public class EditTree {
 	public Node getRoot() {
 		return root;
 	}
-
-	protected void setRoot(Node root) {
-		this.root = root;
-	}
-
+	
 	/**
 	 * return the string produced by an inorder traversal of this tree
 	 */
@@ -142,7 +144,7 @@ public class EditTree {
 	 * @return the height of this tree
 	 */
 	public int height() {
-		return root.height();
+		return height;
 	}
 
 	/**
@@ -245,6 +247,8 @@ public class EditTree {
 		H a = new H();
 		root = root.add(c, pos, a);
 		totalRotationCount += a.rotate;
+		if (!a.treeBalanced)
+			height++;
 		check();
 	}
 
@@ -262,6 +266,8 @@ public class EditTree {
 		H a = new H();
 		root = root.delete(pos, a);
 		totalRotationCount += a.rotate;
+		if (!a.treeBalanced)
+			height--;
 		check();
 		return a.deleted;
 	}
@@ -303,8 +309,8 @@ public class EditTree {
 	public void concatenate(EditTree other) throws IllegalArgumentException {
 		if (this == other)
 			throw new IllegalArgumentException();
-		int height = root.height();
-		int heightOther = other.root.height();
+		int height = height();
+		int heightOther = other.height();
 		H a = new H();
 		if (height >= heightOther) {
 			// this tree is higher than the other tree
@@ -338,7 +344,9 @@ public class EditTree {
 			}
 		}
 		totalRotationCount += a.rotate + other.totalRotationCount;
+		height = root.height();
 		other.root = Node.NULL_NODE;
+		other.height = 0;
 		check();
 	}
 
@@ -356,16 +364,22 @@ public class EditTree {
 	public EditTree split(int pos) throws IndexOutOfBoundsException {
 		if (pos < 0 || pos >= size())
 			throw new IndexOutOfBoundsException();
-		EditTree spl = new EditTree();
+		NodeWrapper spl = new NodeWrapper();
 		H a = new H();
 		H b = new H();
 		root = root.split(pos, a, spl, b);
 		totalRotationCount += a.rotate + b.rotate;
+		height = root.height();
 		check();
-		spl.check();
-		return spl;
+		EditTree editTree = new EditTree(spl.root, spl.root.height());
+		editTree.check();
+		return editTree;
 	}
 
+	public static class NodeWrapper {
+		public Node root;
+	}
+	
 	/**
 	 * 
 	 * Helper class that helps us keep track of the status of various method
