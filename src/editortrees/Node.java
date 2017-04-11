@@ -489,20 +489,13 @@ public class Node {
 
 		if (a.treeBalanced) {
 			// Tree is already balanced, so just go back.
-		} else if (balance == Code.SAME) {
-			a.treeBalanced = true;
-			balance = from.inverse();
-		} else if (balance == from) {
-			balance = Code.SAME;
-		} else if (balance != from) {
-			if (from == Code.LEFT) {
-				return deleteRotateFromLeft(a);
-			} else if (from == Code.RIGHT) {
-				return deleteRotateFromRight(a);
-			}
-			throw new RuntimeException();
+			return this;
 		}
-		return this;
+		if (from == Code.RIGHT) {
+			return deleteFromRight(a);
+		} else {
+			return deleteFromLeft(a);
+		}
 	}
 
 	/**
@@ -523,7 +516,13 @@ public class Node {
 		left = left.deleteSmallest(a);
 		if (a.treeBalanced) {
 			// Tree is already balanced
-		} else if (balance == Code.SAME) {
+			return this;
+		}
+		return deleteFromLeft(a);
+	}
+
+	private Node deleteFromLeft(H a) {
+		if (balance == Code.SAME) {
 			a.treeBalanced = true;
 			balance = Code.RIGHT;
 		} else if (balance == Code.LEFT) {
@@ -552,7 +551,13 @@ public class Node {
 		right = right.deleteBiggest(a);
 		if (a.treeBalanced) {
 			// Tree is already balanced
-		} else if (balance == Code.SAME) {
+			return this;
+		}
+		return deleteFromRight(a);
+	}
+
+	private Node deleteFromRight(H a) {
+		if (balance == Code.SAME) {
 			a.treeBalanced = true;
 			balance = Code.LEFT;
 		} else if (balance == Code.RIGHT) {
