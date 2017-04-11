@@ -158,6 +158,8 @@ public class EditTree {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public char get(int pos) throws IndexOutOfBoundsException {
+		if (pos < 0 || pos >= root.size())
+			throw new IndexOutOfBoundsException();
 		return root.get(pos);
 	}
 
@@ -175,6 +177,8 @@ public class EditTree {
 	 *             within this tree.
 	 */
 	public String get(int pos, int length) throws IndexOutOfBoundsException {
+		if (pos < 0 || pos + length > root.size())
+			throw new IndexOutOfBoundsException();
 		StringBuilder sb = new StringBuilder();
 		root.get(pos, pos + length, sb);
 		return sb.toString();

@@ -143,9 +143,8 @@ public class Node {
 	 * 
 	 * @param pos
 	 * @return
-	 * @throws IndexOutOfBoundsException
 	 */
-	public char get(int pos) throws IndexOutOfBoundsException {
+	public char get(int pos) {
 		if (pos == getRank()) {
 			return element;
 		} else if (pos <= getRank()) {
@@ -834,21 +833,6 @@ public class Node {
 		@Override
 		public int height() {
 			return -1;
-		}
-
-		@Override
-		public int size() {
-			return 0;
-		}
-
-		@Override
-		public char get(int pos) throws IndexOutOfBoundsException {
-			throw new IndexOutOfBoundsException();
-		}
-
-		@Override
-		public void get(int start, int end, StringBuilder sb) {
-			throw new IndexOutOfBoundsException();
 		}
 
 		public int find(String s, int pos, List<Integer> found) {
