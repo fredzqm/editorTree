@@ -189,16 +189,16 @@ public class EditTree implements CharSequence {
 	 *             within this tree.
 	 */
 	public String get(int pos, int length) throws IndexOutOfBoundsException {
-		return subSequence(pos, pos+length).toString();
+		if (pos < 0 || pos + length > length())
+			throw new IndexOutOfBoundsException();
+		StringBuilder sb = new StringBuilder();
+		root.get(pos, pos + length, sb);
+		return sb.toString();
 	}
 
 	@Override
 	public CharSequence subSequence(int start, int end) {
-		if (start < 0 || end > length())
-			throw new IndexOutOfBoundsException();
-		StringBuilder sb = new StringBuilder();
-		root.get(start, end, sb);
-		return sb.toString();
+		return new EditTree(get(start, end - start));
 	}
 
 	/**
