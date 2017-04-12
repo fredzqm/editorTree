@@ -3,9 +3,6 @@ package editortrees;
 import java.util.List;
 import java.util.ListIterator;
 
-import editortrees.EditTree.H;
-import editortrees.EditTree.SH;
-
 /**
  * A node in AVL tree
  * 
@@ -659,5 +656,63 @@ public class Node {
 			break;
 		}
 	}
+	
+	/**
+	 * Another helper class for split, it stores the left and right tree splited
+	 * and their height, so we can easily concanete it with another node
+	 * 
+	 * @author zhang
+	 *
+	 */
+	public static class SH extends H {
+
+		/**
+		 * The result of the splited tree
+		 */
+		public Node leftRoot, rightRoot;
+
+		/**
+		 * the height of those two splited tree
+		 */
+		public int leftHeight, rightHeight;
+	}
+
+	/**
+	 * 
+	 * Helper class that helps us keep track of the status of various method
+	 * that will change the tree structure, including add, delete, concatenate,
+	 * split.
+	 * 
+	 * 
+	 * @author zhangq2. Created Apr 21, 2015.
+	 */
+	public static class H {
+		/**
+		 * keep track of whether the tree is already balanced. true if the tree
+		 * is already balanced and requires no more rotation to balance
+		 */
+		public boolean treeBalanced;
+
+		/**
+		 * store element that was removed some leave and will be used to help
+		 * glue two subtree together.
+		 */
+		public char deleted;
+
+		/**
+		 * keep track of the number of rotation happened during the modification
+		 * operation
+		 */
+		public int rotate;
+
+		public boolean isBalancedAndRest() {
+			if (treeBalanced) {
+				treeBalanced = false;
+				return true;
+			}
+			return false;
+		}
+	}
+
 
 }
