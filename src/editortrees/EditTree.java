@@ -310,6 +310,14 @@ public class EditTree implements CharSequence {
 		return t2;
 	}
 
+	public void insert(int pos, String str) throws IndexOutOfBoundsException {
+		if (pos < 0 || pos > length())
+			throw new IndexOutOfBoundsException();
+		EditTree t2 = this.split(pos);
+		this.concatenate(new EditTree(str));
+		this.concatenate(t2);
+	}
+
 	/**
 	 * Append (in time proportional to the log of the size of the larger tree)
 	 * the contents of the other tree to this one. Other should be made empty
@@ -377,7 +385,7 @@ public class EditTree implements CharSequence {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public EditTree split(int pos) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos >= length())
+		if (pos < 0 || pos > length())
 			throw new IndexOutOfBoundsException();
 		SH result = new SH();
 		root.split(pos, height, result);
