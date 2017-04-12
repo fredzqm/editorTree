@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Stack;
 
+import debughelp.DisplayableBinaryTree;
 import editortrees.Node.Code;
 
 // A height-balanced binary tree with rank that could be the basis for a text editor.
@@ -109,7 +110,12 @@ public class EditTree {
 	 */
 	@Override
 	public String toString() {
-		return root.toString();
+		StringBuilder sb = new StringBuilder();
+		Iterator<Character> itr = iterator();
+		while (itr.hasNext()) {
+			sb.append(itr.next());
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -383,12 +389,12 @@ public class EditTree {
 	 *
 	 */
 	public static class SH extends H {
-		
+
 		/**
 		 * The result of the splited tree
 		 */
 		public Node leftRoot, rightRoot;
-		
+
 		/**
 		 * the height of those two splited tree
 		 */
@@ -444,30 +450,34 @@ public class EditTree {
 	 * 
 	 */
 	public void check() {
-		if (size() < 1000) {
-			X x = new X();
-			root.check(x);
-			if (height != x.height)
-				throw new RuntimeException("Height in Editor tree is not updated: " + height + " " + x.height);
+		if (Node.NULL_NODE.getLeft() != null || Node.NULL_NODE.getRight() != null || Node.NULL_NODE.size() != 0
+				|| Node.NULL_NODE.getBalance() != null || Node.NULL_NODE.getElement() != 0)
+			throw new RuntimeException("NULL_NODE changed!");
+		if (size() < 10000) {
+			try {
+				root.check(height);
+			} catch (RuntimeException e) {
+				DisplayableBinaryTree t = new DisplayableBinaryTree(this);
+				t.show(true);
+				while (true)
+					;
+			}
 		}
 	}
 
-	public static class X {
-		public int height;
-		public int size;
+	public Iterator<Character> iterator() {
+		return new InOrderIterator();
 	}
 
-	public Iterator<Character> nodeIterator() {
-		return new InOrderIterator(root);
-	}
+	class InOrderIterator implements Iterator<Character> {
+		private Stack<Node> stack;
 
-	static class InOrderIterator implements Iterator<Character> {
-		Stack<Node> stack;
-		Node current;
-
-		public InOrderIterator(Node root) {
+		public InOrderIterator() {
 			stack = new Stack<Node>();
-			current = root;
+			advance(root);
+		}
+
+		private void advance(Node current) {
 			while (current != Node.NULL_NODE) {
 				stack.push(current);
 				current = current.getLeft();
@@ -484,12 +494,8 @@ public class EditTree {
 			if (!hasNext()) {
 				throw new NoSuchElementException();
 			}
-			current = stack.pop();
-			Node next = current.getRight();
-			while (next != Node.NULL_NODE) {
-				stack.push(next);
-				next = next.getLeft();
-			}
+			Node current = stack.pop();
+			advance(current.getRight());
 			return current.getElement();
 		}
 

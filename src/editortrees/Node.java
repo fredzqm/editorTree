@@ -5,7 +5,6 @@ import java.util.ListIterator;
 
 import editortrees.EditTree.H;
 import editortrees.EditTree.SH;
-import editortrees.EditTree.X;
 
 /**
  * A node in AVL tree
@@ -633,32 +632,32 @@ public class Node {
 	 * check whether this node has correct rank, balance code, whether NULL_NODE
 	 * stays the same.
 	 * 
-	 * @param x
+	 * @param height
 	 */
-	public void check(X x) {
+	public void check(int height) {
 		if (this == NULL_NODE) {
-			if (left != null || right != null || size != 0 || getBalance() != null || getElement() != 0)
-				throw new RuntimeException("NULL_NODE changed!");
-			x.height = -1;
-			x.size = 0;
+			if (height != -1)
+				throw new RuntimeException("Balanced code is not correct");
 			return;
 		}
-		left.check(x);
-		int leftHeight = x.height;
-		int leftSize = x.size;
-		right.check(x);
-		int rightHeight = x.height;
-		int rightSize = x.size;
-
-		// check size
-		x.size = leftSize + rightSize + 1;
-		if (x.size != size)
-			throw new RuntimeException("size: " + x.size + " " + size);
-
-		// check balanced code
-		x.height = Math.max(leftHeight, rightHeight) + 1;
-		if (rightHeight - leftHeight != getBalance().hdiff())
-			throw new RuntimeException("same: " + leftHeight + " " + rightHeight);
+		if (this.size() != left.size() + right.size() + 1)
+			throw new RuntimeException("Size is not consistent");
+		switch (getBalance()) {
+		case LEFT:
+			left.check(height-1);
+			right.check(height-2);
+			break;
+		case RIGHT:
+			left.check(height-2);
+			right.check(height-1);
+			break;
+		case SAME:
+			left.check(height-1);
+			right.check(height-1);
+			break;
+		default:
+			break;
+		}
 	}
 
 }
