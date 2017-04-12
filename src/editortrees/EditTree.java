@@ -309,39 +309,47 @@ public class EditTree {
 	public void concatenate(EditTree other) throws IllegalArgumentException {
 		if (this == other)
 			throw new IllegalArgumentException();
-		int height = height();
+		int heightThis = height();
 		int heightOther = other.height();
 		H a = new H();
-		if (height >= heightOther) {
+		if (heightThis >= heightOther) {
 			// this tree is higher than the other tree
 			if (heightOther == -1) {
+				// other is empty, do nothing
 			} else if (heightOther == 0) {
-				root = root.add(other.root.getElement(), size(), a);
+				this.add(other.root.getElement());
 			} else {
 				other.root = other.root.delete(0, a);
 				if (a.treeBalanced)
 					a.treeBalanced = false;
 				else
 					heightOther--;
-				root = root.concatRight(a, other.root, height - heightOther);
+				root = root.concatRight(a, other.root, heightThis - heightOther);
+				if (!a.treeBalanced)
+					this.height++;
 			}
 		} else {
 			// this tree is lower than the other tree
-			if (height == -1) {
-				root = other.root;
-			} else if (height == 0) {
-				root = other.root.add(root.getElement(), 0, a);
+			if (heightThis == -1) {
+				this.root = other.root;
+				this.height = other.height;
+			} else if (heightThis == 0) {
+				other.add(this.root.getElement(), 0);
+				this.root = other.root;
+				this.height = other.height;
 			} else {
-				root = root.delete(size() - 1, a);
+				this.root = root.delete(size() - 1, a);
 				if (a.treeBalanced)
 					a.treeBalanced = false;
 				else
-					height--;
-				root = other.root.concatLeft(a, root, heightOther - height);
+					heightThis--;
+				this.root = other.root.concatLeft(a, root, heightOther - heightThis);
+				this.height = other.height;
+				if (!a.treeBalanced)
+					this.height++;
 			}
 		}
 		totalRotationCount += a.rotate + other.totalRotationCount;
-		this.height = this.root.height();
 		other.root = Node.NULL_NODE;
 		other.height = -1;
 		check();
