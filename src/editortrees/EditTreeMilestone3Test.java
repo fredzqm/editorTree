@@ -2616,11 +2616,11 @@ public class EditTreeMilestone3Test {
 
 		// Test using sizes and heights.
 		assertEquals(t1s.toString(), t1.toString());
-		assertTrue(t1.height() <= maxHeight(t1.size()));
+		assertTrue(t1.height() <= maxHeight(t1.length()));
 		assertEquals(t2s.toString(), t2.toString());
-		assertTrue(t2.height() <= maxHeight(t2.size()));
+		assertTrue(t2.height() <= maxHeight(t2.length()));
 		assertEquals(t3s.toString(), t3.toString());
-		assertTrue(t3.height() <= maxHeight(t3.size()));
+		assertTrue(t3.height() <= maxHeight(t3.length()));
 		assertEquals(0, t3.totalRotationCount());
 
 		assertEquals(t1s.height(), t1.height());
@@ -2631,19 +2631,19 @@ public class EditTreeMilestone3Test {
 		t3.add('x');
 		EditTree t4 = new EditTree(t3);
 		assertEquals(t3.toString(), t4.toString());
-		assertTrue(t4.height() <= maxHeight(t4.size()));
+		assertTrue(t4.height() <= maxHeight(t4.length()));
 
 		// Add to tree I copied to. Are balance codes and ranks set?
 		t4.add('y', 2);
 		EditTree t5 = new EditTree(t4);
 		assertEquals(t4.toString(), t5.toString());
-		assertTrue(t5.height() <= maxHeight(t5.size()));
+		assertTrue(t5.height() <= maxHeight(t5.length()));
 
 		// Add again to tree I copied to, but causing a rotation
 		t5.add('z', 2);
 		EditTree t6 = new EditTree(t5);
 		assertEquals(t5.toString(), t6.toString());
-		assertTrue(t6.height() <= maxHeight(t6.size()));
+		assertTrue(t6.height() <= maxHeight(t6.length()));
 		assertEquals(0, t3.totalRotationCount());
 		m2points += 2 * m2weight;
 	}
@@ -2747,7 +2747,7 @@ public class EditTreeMilestone3Test {
 		EditTree t = new EditTree();
 		for (int i = 0; i < lengthWord; i++) {
 			char c = (char) ('a' + (gen.nextInt(alphabetSize)));
-			int pos = gen.nextInt(t.size() + 1);
+			int pos = gen.nextInt(t.length() + 1);
 			t.add(c, pos);
 			analog.insert(pos, c);
 		}
@@ -2929,12 +2929,12 @@ public class EditTreeMilestone3Test {
 		EditTree t5 = makeFullTreeWithHeight(1, 'a');
 		EditTree t6 = makeFullTreeWithHeight(3, 'a');
 
-		assertEquals(t1.toString(), t1.get(0, t1.size()));
-		assertEquals(t2.toString(), t2.get(0, t2.size()));
-		assertEquals(t3.toString(), t3.get(0, t3.size()));
-		assertEquals(t4.toString(), t4.get(0, t4.size()));
-		assertEquals(t5.toString(), t5.get(0, t5.size()));
-		assertEquals(t6.toString(), t6.get(0, t6.size()));
+		assertEquals(t1.toString(), t1.get(0, t1.length()));
+		assertEquals(t2.toString(), t2.get(0, t2.length()));
+		assertEquals(t3.toString(), t3.get(0, t3.length()));
+		assertEquals(t4.toString(), t4.get(0, t4.length()));
+		assertEquals(t5.toString(), t5.get(0, t5.length()));
+		assertEquals(t6.toString(), t6.get(0, t6.length()));
 
 		m3points += 1 * m3weight;
 	}
@@ -3037,13 +3037,13 @@ public class EditTreeMilestone3Test {
 		// Can build these trees in ways that require no rotations.
 		assertEquals("", t1.toString());
 		h = t1.height();
-		max = maxHeight(t1.size());
+		max = maxHeight(t1.length());
 		assertTrue(h <= max);
 		assertEquals("abc", t2.toString());
-		assertTrue(t2.height() <= maxHeight(t2.size()));
+		assertTrue(t2.height() <= maxHeight(t2.length()));
 		assertEquals("abcdefghijkl", t3.toString());
 		h = t3.height();
-		max = maxHeight(t3.size());
+		max = maxHeight(t3.length());
 		assertTrue(h <= max);
 
 		m3points += 5 * m3weight;
@@ -3070,8 +3070,8 @@ public class EditTreeMilestone3Test {
 	public boolean attemptConcatenation(EditTree t1, EditTree t2) {
 		int hT1 = t1.height();
 		int hT2 = t2.height();
-		int sT1 = t1.size();
-		int sT2 = t2.size();
+		int sT1 = t1.length();
+		int sT2 = t2.length();
 
 		boolean result = true;
 
@@ -3104,7 +3104,7 @@ public class EditTreeMilestone3Test {
 		t1.add('0');
 
 		result = result && t1.toString().equals("01" + expected + "10");
-		result = result && t1.height() <= maxHeight(t1.size());
+		result = result && t1.height() <= maxHeight(t1.length());
 
 		return result;
 	}
@@ -3491,15 +3491,15 @@ public class EditTreeMilestone3Test {
 		for (int height = 0; height < 5; height++) {
 			EditTree t1 = makeFullTreeWithHeight(height, 'a');
 			String str = t1.toString();
-			for (int i = 0; i < t1.size(); i++) {
+			for (int i = 0; i < t1.length(); i++) {
 				EditTree t3 = new EditTree(t1);
 				EditTree t2 = t3.split(i);
 				String s1 = str.substring(0, i);
 				String s2 = str.substring(i);
 				assertEquals(s1, t3.toString());
 				assertEquals(s2, t2.toString());
-				assertTrue(t3.height() <= maxHeight(t3.size()));
-				assertTrue(t2.height() <= maxHeight(t2.size()));
+				assertTrue(t3.height() <= maxHeight(t3.length()));
+				assertTrue(t2.height() <= maxHeight(t2.length()));
 			}
 		}
 
@@ -3510,7 +3510,7 @@ public class EditTreeMilestone3Test {
 	public void testSplitJaggedTree() {
 		EditTree t1 = makeTreeFromSlides();
 		String str = t1.toString();
-		for (int i = 0; i < t1.size(); i++) {
+		for (int i = 0; i < t1.length(); i++) {
 			// Start with a fresh copy of t1 every time since t1 is modified by
 			// the split.
 			EditTree t3 = new EditTree(t1);
@@ -3519,8 +3519,8 @@ public class EditTreeMilestone3Test {
 			String s2 = str.substring(i);
 			assertEquals(s1, t3.toString());
 			assertEquals(s2, t2.toString());
-			assertTrue(t3.height() <= maxHeight(t3.size()));
-			assertTrue(t2.height() <= maxHeight(t2.size()));
+			assertTrue(t3.height() <= maxHeight(t3.length()));
+			assertTrue(t2.height() <= maxHeight(t2.length()));
 		}
 
 		m3points += 5 * m3weight;
@@ -3539,7 +3539,7 @@ public class EditTreeMilestone3Test {
 		}
 
 		assertEquals(19, t.height());
-		assertEquals(NUM_NODES, t.size());
+		assertEquals(NUM_NODES, t.length());
 		assertEquals(999980, t.totalRotationCount());
 		m3points += 2 * m3weight;
 	}
@@ -3552,7 +3552,7 @@ public class EditTreeMilestone3Test {
 		}
 
 		assertEquals(19, t.height());
-		assertEquals(NUM_NODES, t.size());
+		assertEquals(NUM_NODES, t.length());
 		assertEquals(999980, t.totalRotationCount());
 		m3points += 2 * m3weight;
 	}
@@ -3573,7 +3573,7 @@ public class EditTreeMilestone3Test {
 				t.add(toAdd, random.nextInt(SKIP_INTERVAL * k + j + 1));
 			}
 		}
-		assertEquals(NUM_NODES, t.size());
+		assertEquals(NUM_NODES, t.length());
 
 		m3points += 2 * m3weight;
 

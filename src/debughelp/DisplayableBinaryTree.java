@@ -127,7 +127,7 @@ public class DisplayableBinaryTree extends JComponent {
 		this.frame = new JFrame();
 		this.frame.setFocusable(true);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.frame.setMinimumSize(new Dimension(this.tree.size() * 20 + 18, this.tree.height() * 20 + 45));
+		this.frame.setMinimumSize(new Dimension(this.tree.length() * 20 + 18, this.tree.height() * 20 + 45));
 		this.frame.setSize(new Dimension(this.width, this.height));
 		// set the background color to a stormy gray
 		this.frame.getContentPane().setBackground(BACKGROUND_COLOR);
@@ -163,7 +163,7 @@ public class DisplayableBinaryTree extends JComponent {
 		this.height = this.frame.getHeight() - 45; // adjust for the margins
 
 		int treeHeight = this.tree.height();
-		int treeSize = this.tree.size();
+		int treeSize = this.tree.length();
 		if (treeSize < 1) {
 			return;
 		}

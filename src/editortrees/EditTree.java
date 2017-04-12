@@ -189,10 +189,15 @@ public class EditTree implements CharSequence {
 	 *             within this tree.
 	 */
 	public String get(int pos, int length) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos + length > length())
+		return subSequence(pos, pos+length).toString();
+	}
+
+	@Override
+	public CharSequence subSequence(int start, int end) {
+		if (start < 0 || end > length())
 			throw new IndexOutOfBoundsException();
 		StringBuilder sb = new StringBuilder();
-		root.get(pos, pos + length, sb);
+		root.get(start, end, sb);
 		return sb.toString();
 	}
 
@@ -306,11 +311,6 @@ public class EditTree implements CharSequence {
 		return t2;
 	}
 
-	@Override
-	public CharSequence subSequence(int start, int end) {
-		return null;
-	}
-	
 	/**
 	 * Append (in time proportional to the log of the size of the larger tree)
 	 * the contents of the other tree to this one. Other should be made empty
@@ -485,10 +485,10 @@ public class EditTree implements CharSequence {
 		return new InOrderIterator();
 	}
 
-	class InOrderIterator implements Iterator<Character> {
+	private class InOrderIterator implements Iterator<Character> {
 		private Stack<Node> stack;
-		int version;
-		
+		private int version;
+
 		public InOrderIterator() {
 			stack = new Stack<Node>();
 			version = treeVersion;
@@ -509,9 +509,8 @@ public class EditTree implements CharSequence {
 
 		@Override
 		public Character next() {
-			if (!hasNext()) {
+			if (!hasNext())
 				throw new NoSuchElementException();
-			}
 			if (treeVersion != version)
 				throw new ConcurrentModificationException();
 			Node current = stack.pop();

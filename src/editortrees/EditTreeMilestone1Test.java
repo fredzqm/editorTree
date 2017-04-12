@@ -1248,7 +1248,7 @@ public class EditTreeMilestone1Test {
 		}
 
 		assertEquals(19, t.height());
-		assertEquals(NUM_NODES, t.size());
+		assertEquals(NUM_NODES, t.length());
 		assertEquals(999980, t.totalRotationCount());
 		m1points += m1weight;
 	}
@@ -1261,7 +1261,7 @@ public class EditTreeMilestone1Test {
 		}
 
 		assertEquals(19, t.height());
-		assertEquals(NUM_NODES, t.size());
+		assertEquals(NUM_NODES, t.length());
 		assertEquals(999980, t.totalRotationCount());
 		m1points += m1weight;
 	}
@@ -1282,7 +1282,7 @@ public class EditTreeMilestone1Test {
 				t.add(toAdd, random.nextInt(SKIP_INTERVAL * k + j + 1));
 			}
 		}
-		assertEquals(NUM_NODES, t.size());
+		assertEquals(NUM_NODES, t.length());
 
 		m1points += m1weight;
 
