@@ -608,53 +608,49 @@ public class Node {
 	 *            second helper class
 	 * @return root node of the left spliced tree
 	 */
-	public Node split(int pos, H a, NodeWrapper spl, H b) {
+	public void split(int pos, H a, NodeWrapper spl, H b) {
 		if (this == NULL_NODE)
 			throw new RuntimeException();
 		if (pos == getRank() || pos == getRank() + 1) {
 			// basis case when we can cut this subtree besides the node
-			Node l = left;
-			spl.root = right;
+			spl.leftRoot = left;
+			spl.rightRoot = right;
 			if (pos == getRank()) {
-				spl.root = spl.root.add(getElement(), 0, b);
+				spl.rightRoot = spl.rightRoot.add(getElement(), 0, b);
 				updateHdiff(b);
 			} else {
-				l = left.add(getElement(), left.size(), a);
+				spl.leftRoot = spl.leftRoot.add(getElement(), spl.leftRoot.size(), a);
 				updateHdiff(a);
 			}
 			synHdiff(a, b);
-			return l;
-		}
-		if (pos < getRank()) {
-			Node l = left.split(pos, a, spl, b);
+		} else if (pos < getRank()) {
+			left.split(pos, a, spl, b);
 			b.hdiff += getBalance().hdiff();
 			b.deleted = getElement();
 			if (b.hdiff >= 0) {
-				spl.root = right.concatLeft(b, spl.root, b.hdiff);
+				spl.rightRoot = right.concatLeft(b, spl.rightRoot, b.hdiff);
 				updateHdiff(b);
 			} else {
-				spl.root = spl.root.concatRight(b, right, -b.hdiff);
+				spl.rightRoot = spl.rightRoot.concatRight(b, right, -b.hdiff);
 				updateHdiff(b);
 				b.hdiff--;
 			}
 			a.hdiff++;
 			synHdiff(a, b);
-			return l;
 		} else {
-			Node l = right.split(pos - getRank() - 1, a, spl, b);
+			right.split(pos - getRank() - 1, a, spl, b);
 			a.hdiff -= getBalance().hdiff();
 			a.deleted = getElement();
 			if (a.hdiff >= 0) {
-				l = left.concatRight(a, l, a.hdiff);
+				spl.leftRoot = left.concatRight(a, spl.leftRoot, a.hdiff);
 				updateHdiff(a);
 			} else {
-				l = l.concatLeft(a, left, -a.hdiff);
+				spl.leftRoot = spl.leftRoot.concatLeft(a, left, -a.hdiff);
 				updateHdiff(a);
 				a.hdiff--;
 			}
 			b.hdiff++;
 			synHdiff(a, b);
-			return l;
 		}
 	}
 

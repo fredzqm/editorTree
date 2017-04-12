@@ -369,19 +369,19 @@ public class EditTree {
 		if (pos < 0 || pos >= size())
 			throw new IndexOutOfBoundsException();
 		NodeWrapper spl = new NodeWrapper();
-		H a = new H();
-		H b = new H();
-		root = root.split(pos, a, spl, b);
-		totalRotationCount += a.rotate + b.rotate;
-		height = root.height();
+		H a = new H(), b = new H();
+		root.split(pos, a, spl, b);
+		this.root = spl.leftRoot;
+		this.height = spl.leftRoot.height();
 		check();
-		EditTree editTree = new EditTree(spl.root, spl.root.height());
+		EditTree editTree = new EditTree(spl.rightRoot, spl.rightRoot.height());
 		editTree.check();
+		totalRotationCount += a.rotate + b.rotate;
 		return editTree;
 	}
 
 	public static class NodeWrapper {
-		public Node root;
+		public Node leftRoot, rightRoot;
 	}
 
 	/**
