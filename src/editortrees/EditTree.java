@@ -196,7 +196,7 @@ public class EditTree implements CharSequence {
 	}
 
 	@Override
-	public CharSequence subSequence(int start, int end) {
+	public EditTree subSequence(int start, int end) {
 		return new EditTree(get(start, end - start));
 	}
 
