@@ -14,7 +14,7 @@ import editortrees.Node.Code;
  * @author zhang
  *
  */
-public class EditTree {
+public class EditTree implements CharSequence {
 	private Node root;
 	private int totalRotationCount;
 	private int height;
@@ -156,7 +156,8 @@ public class EditTree {
 	 * 
 	 * @return the number of nodes in this tree
 	 */
-	public int size() {
+	@Override
+	public int length() {
 		return root.size();
 	}
 
@@ -167,8 +168,9 @@ public class EditTree {
 	 * @return the character at that position
 	 * @throws IndexOutOfBoundsException
 	 */
-	public char get(int pos) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos >= size())
+	@Override
+	public char charAt(int pos) throws IndexOutOfBoundsException {
+		if (pos < 0 || pos >= length())
 			throw new IndexOutOfBoundsException();
 		return root.get(pos);
 	}
@@ -187,7 +189,7 @@ public class EditTree {
 	 *             within this tree.
 	 */
 	public String get(int pos, int length) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos + length > size())
+		if (pos < 0 || pos + length > length())
 			throw new IndexOutOfBoundsException();
 		StringBuilder sb = new StringBuilder();
 		root.get(pos, pos + length, sb);
@@ -233,7 +235,7 @@ public class EditTree {
 	 *            character to add to the end of this tree.
 	 */
 	public void add(char c) {
-		add(c, size());
+		add(c, length());
 	}
 
 	/**
@@ -247,7 +249,7 @@ public class EditTree {
 	 *             id pos is negative or too large for this tree
 	 */
 	public void add(char c, int pos) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos > size())
+		if (pos < 0 || pos > length())
 			throw new IndexOutOfBoundsException();
 		H a = new H();
 		root = root.add(c, pos, a);
@@ -267,7 +269,7 @@ public class EditTree {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public char delete(int pos) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos >= size())
+		if (pos < 0 || pos >= length())
 			throw new IndexOutOfBoundsException();
 		H a = new H();
 		root = root.delete(pos, a);
@@ -295,7 +297,7 @@ public class EditTree {
 	 *             tree.
 	 */
 	public EditTree delete(int start, int length) throws IndexOutOfBoundsException {
-		if (start < 0 || start + length >= this.size())
+		if (start < 0 || start + length >= this.length())
 			throw new IndexOutOfBoundsException(
 					(start < 0) ? "negative first argument to delete" : "delete range extends past end of string");
 		EditTree t2 = this.split(start);
@@ -304,6 +306,11 @@ public class EditTree {
 		return t2;
 	}
 
+	@Override
+	public CharSequence subSequence(int start, int end) {
+		return null;
+	}
+	
 	/**
 	 * Append (in time proportional to the log of the size of the larger tree)
 	 * the contents of the other tree to this one. Other should be made empty
@@ -343,7 +350,7 @@ public class EditTree {
 				this.root = other.root;
 				this.height = other.height;
 			} else {
-				this.root = root.delete(size() - 1, a);
+				this.root = root.delete(length() - 1, a);
 				if (!a.isBalancedAndRest())
 					heightThis--;
 				this.root = other.root.concatLeft(a, root, heightOther - heightThis);
@@ -371,7 +378,7 @@ public class EditTree {
 	 * @throws IndexOutOfBoundsException
 	 */
 	public EditTree split(int pos) throws IndexOutOfBoundsException {
-		if (pos < 0 || pos >= size())
+		if (pos < 0 || pos >= length())
 			throw new IndexOutOfBoundsException();
 		SH result = new SH();
 		root.split(pos, height, result);
@@ -462,7 +469,7 @@ public class EditTree {
 		if (Node.NULL_NODE.getLeft() != null || Node.NULL_NODE.getRight() != null || Node.NULL_NODE.size() != 0
 				|| Node.NULL_NODE.getBalance() != null || Node.NULL_NODE.getElement() != 0)
 			throw new RuntimeException("NULL_NODE changed!");
-		if (size() < 10000) {
+		if (length() < 10000) {
 			try {
 				root.check(height);
 			} catch (RuntimeException e) {

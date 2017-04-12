@@ -973,7 +973,7 @@ public class EditTreeMilestone2Test {
 
 	public void assertStringByChar(String expected, EditTree t) {
 		for (int i = 0; i < expected.length(); i++) {
-			assertEquals(expected.charAt(i), t.get(i));
+			assertEquals(expected.charAt(i), t.charAt(i));
 		}
 	}
 
@@ -1119,14 +1119,14 @@ public class EditTreeMilestone2Test {
 	public void testThrowsGetIndexExceptions() {
 		EditTree t1 = new EditTree();
 		try {
-			t1.get(0);
+			t1.charAt(0);
 			fail("Did not throw IndexOutOfBoundsException");
 		} catch (IndexOutOfBoundsException e) {
 		}
 
 		EditTree t2 = new EditTree();
 		try {
-			t2.get(-1);
+			t2.charAt(-1);
 			fail("Did not throw IndexOutOfBoundsException");
 		} catch (IndexOutOfBoundsException e) {
 		}
@@ -1134,7 +1134,7 @@ public class EditTreeMilestone2Test {
 		EditTree t3 = new EditTree();
 		t3.add('a');
 		try {
-			t3.get(1);
+			t3.charAt(1);
 			fail("Did not throw IndexOutOfBoundsException");
 		} catch (IndexOutOfBoundsException e) {
 		}
@@ -1142,7 +1142,7 @@ public class EditTreeMilestone2Test {
 		EditTree t4 = new EditTree();
 		t4.add('a');
 		try {
-			t4.get(-1);
+			t4.charAt(-1);
 			fail("Did not throw IndexOutOfBoundsException");
 		} catch (IndexOutOfBoundsException e) {
 		}
@@ -1152,7 +1152,7 @@ public class EditTreeMilestone2Test {
 		t5.add('a', 0);
 		t5.add('c');
 		try {
-			t5.get(3);
+			t5.charAt(3);
 		} catch (IndexOutOfBoundsException e) {
 		}
 
@@ -1161,7 +1161,7 @@ public class EditTreeMilestone2Test {
 		t6.add('a', 0);
 		t6.add('c');
 		try {
-			t6.get(-1);
+			t6.charAt(-1);
 			fail("Did not throw IndexOutOfBoundsException");
 		} catch (IndexOutOfBoundsException e) {
 		}
@@ -1175,7 +1175,7 @@ public class EditTreeMilestone2Test {
 		t7.add('e', 4);
 		t7.add('g');
 		try {
-			t7.get(7);
+			t7.charAt(7);
 			fail("Did not throw IndexOutOfBoundsException");
 		} catch (IndexOutOfBoundsException e) {
 		}
@@ -1189,7 +1189,7 @@ public class EditTreeMilestone2Test {
 		t8.add('e', 4);
 		t8.add('g');
 		try {
-			t8.get(-1);
+			t8.charAt(-1);
 			fail("Did not throw IndexOutOfBoundsException");
 		} catch (IndexOutOfBoundsException e) {
 		}
