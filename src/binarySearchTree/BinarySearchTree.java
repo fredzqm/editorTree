@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Stack;
 
@@ -12,12 +13,12 @@ import java.util.Stack;
  * Implementation of most of the Set interface operations using a Binary Search
  * Tree
  *
- * @author Matt Boutell and <<< YOUR NAME HERE >>>.
+ * @author Matt Boutell and zhangq2
  * @param <T>
  */
 
 public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
-	public final NullBinaryNode NULL_NODE = new NullBinaryNode();
+	public final Node NULL_NODE = new Node();
 	private Node root;
 	private int treeVersion;
 
@@ -27,10 +28,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 	 */
 	public BinarySearchTree() {
 		root = NULL_NODE;
-		treeVersion = 0;
 	}
 
-	// For manual tests only
 	void setRoot(Node n) {
 		this.root = n;
 	}
@@ -184,6 +183,9 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		protected Node left;
 		protected Node right;
 
+		public Node() {
+		}
+
 		public Node(T element) {
 			this.data = element;
 			this.left = NULL_NODE;// NULL_NODE;s
@@ -216,6 +218,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		 * @return the size of the subtree from this node
 		 */
 		public int size() {
+			if (this == NULL_NODE)
+				return 0;
 			return left.size() + right.size() + 1;
 		}
 
@@ -226,6 +230,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		 * @return the height of the subtree from this node
 		 */
 		public int height() {
+			if (this == NULL_NODE)
+				return -1;
 			return 1 + Math.max(left.height(), right.height());
 		}
 
@@ -237,6 +243,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		 * @return true if the element is included in this tree
 		 */
 		public boolean containsNonBST(T item) {
+			if (this == NULL_NODE)
+				return false;
 			if (data.equals(item))
 				return true;
 			return left.containsNonBST(item) || right.containsNonBST(item);
@@ -251,7 +259,9 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		 *            add element of left subtree, itself and right subtree to
 		 *            this arrayList, so item will be in the order.
 		 */
-		public void addItemsToList(ArrayList<T> list) {
+		public void addItemsToList(List<T> list) {
+			if (this == NULL_NODE)
+				return;
 			left.addItemsToList(list);
 			list.add(this.getData());
 			right.addItemsToList(list);
@@ -259,7 +269,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 
 		@Override
 		public String toString() {
-			ArrayList<T> list = new ArrayList<T>();
+			List<T> list = new ArrayList<T>();
 			addItemsToList(list);
 			return list.toString();
 		}
@@ -271,18 +281,20 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		 * @param item
 		 *            item to be inserted
 		 * @param b
-		 *            the Boolean object to keep track of whehter insertion is
+		 *            the Boolean object to keep track of whether insertion is
 		 *            successful or not
 		 * @return the updated node in this side; itself if no changed is made
 		 *         in this subtree
 		 */
 		public Node insert(T item, Boolean b) {
+			if (this == NULL_NODE) {
+				b.found = true;
+				return new Node(item);
+			}
 			if (data.compareTo(item) > 0) {
 				left = left.insert(item, b);
 			} else if (data.compareTo(item) < 0) {
 				right = right.insert(item, b);
-			} else {
-				return this;
 			}
 			return this;
 		}
@@ -294,6 +306,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		 * @return true if item is found here
 		 */
 		public boolean contains(T item) {
+			if (this == NULL_NODE)
+				return false;
 			if (getData().equals(item))
 				return true;
 			if (getData().compareTo(item) > 0)
@@ -312,10 +326,17 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		 *         changed inside
 		 */
 		public Node remove(T item, Boolean b) {
+			if (this == NULL_NODE)
+				return NULL_NODE;
 			if (getData().equals(item)) {
 				b.set(true);
 				if (left != NULL_NODE && right != NULL_NODE) {
-					replaceItselfByLeft();
+					if (left.right == NULL_NODE) {
+						data = left.data;
+						left = left.left;
+					} else {
+						data = left.removeLargest();
+					}
 					return this;
 				} else if (left != NULL_NODE) {
 					return left;
@@ -334,19 +355,6 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		}
 
 		/**
-		 * replace this node by the largest element in its left subtree. This
-		 * method is used when we want to remove a node with both left and right
-		 * subtrees
-		 */
-		private void replaceItselfByLeft() {
-			if (left.right == NULL_NODE) {
-				data = left.data;
-				left = left.left;
-			} else
-				data = left.removeLargest();
-		}
-
-		/**
 		 * 
 		 * remove the largest element in the subtree
 		 * 
@@ -359,60 +367,6 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 				return largest;
 			}
 			return right.removeLargest();
-		}
-	}
-
-	/**
-	 * 
-	 * A subclass of BinaryNode to represent NULL_NODE. It has lots of method
-	 * overiding its superclass, so we can avoid null pointer exception and if
-	 * stated in each recursion to check if the node is NULL_NODE
-	 * 
-	 * @author zhangq2. Created Mar 26, 2015.
-	 */
-	class NullBinaryNode extends Node {
-
-		public NullBinaryNode() {
-			super(null);
-			left = this;
-			right = this;
-		}
-
-		@Override
-		public int size() {
-			return 0;
-		}
-
-		@Override
-		public int height() {
-			return -1;
-		}
-
-		@Override
-		public boolean containsNonBST(T item) {
-			return false;
-		}
-
-		@Override
-		public void addItemsToList(ArrayList<T> list) {
-			// there is nothing in Null node, so just skip this node and move
-			// on.
-		}
-
-		@Override
-		public Node insert(T item, Boolean b) {
-			b.set(true);
-			return new Node(item);
-		}
-
-		@Override
-		public boolean contains(T item) {
-			return false;
-		}
-
-		@Override
-		public Node remove(T item, Boolean b) {
-			return this;
 		}
 	}
 
@@ -454,9 +408,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 
 		@Override
 		public void remove() {
-			if (current == NULL_NODE) {
+			if (current == NULL_NODE)
 				throw new IllegalStateException();
-			}
 			BinarySearchTree.this.remove(current.data);
 			version = treeVersion;
 			current = NULL_NODE;
@@ -493,9 +446,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 
 		@Override
 		public T next() {
-			if (!hasNext()) {
+			if (!hasNext())
 				throw new NoSuchElementException();
-			}
 			if (treeVersion != version)
 				throw new ConcurrentModificationException();
 			current = stack.pop();
@@ -547,9 +499,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 
 		@Override
 		public T next() {
-			if (!hasNext()) {
+			if (!hasNext())
 				throw new NoSuchElementException();
-			}
 			if (treeVersion != version)
 				throw new ConcurrentModificationException();
 			Node next = stack.peek().getRight();
