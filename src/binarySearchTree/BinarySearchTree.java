@@ -18,7 +18,7 @@ import java.util.Stack;
 
 public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 	public final NullBinaryNode NULL_NODE = new NullBinaryNode();
-	private BinaryNode root;
+	private Node root;
 	private int treeVersion;
 
 	/**
@@ -31,7 +31,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 	}
 
 	// For manual tests only
-	void setRoot(BinaryNode n) {
+	void setRoot(Node n) {
 		this.root = n;
 	}
 
@@ -179,12 +179,12 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 	}
 
 	// Not private, since we need access for manual testing.
-	class BinaryNode {
+	class Node {
 		private T data;
-		protected BinaryNode left;
-		protected BinaryNode right;
+		protected Node left;
+		protected Node right;
 
-		public BinaryNode(T element) {
+		public Node(T element) {
 			this.data = element;
 			this.left = NULL_NODE;// NULL_NODE;s
 			this.right = NULL_NODE;// NULL_NODE;
@@ -194,20 +194,20 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 			return this.data;
 		}
 
-		public BinaryNode getLeft() {
+		public Node getLeft() {
 			return this.left;
 		}
 
-		public BinaryNode getRight() {
+		public Node getRight() {
 			return this.right;
 		}
 
 		// For manual testing
-		public void setLeft(BinaryNode left) {
+		public void setLeft(Node left) {
 			this.left = left;
 		}
 
-		public void setRight(BinaryNode right) {
+		public void setRight(Node right) {
 			this.right = right;
 		}
 
@@ -276,7 +276,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		 * @return the updated node in this side; itself if no changed is made
 		 *         in this subtree
 		 */
-		public BinaryNode insert(T item, Boolean b) {
+		public Node insert(T item, Boolean b) {
 			if (data.compareTo(item) > 0) {
 				left = left.insert(item, b);
 			} else if (data.compareTo(item) < 0) {
@@ -311,7 +311,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		 * @return an updated node in this position; itself if nothing is
 		 *         changed inside
 		 */
-		public BinaryNode remove(T item, Boolean b) {
+		public Node remove(T item, Boolean b) {
 			if (getData().equals(item)) {
 				b.set(true);
 				if (left != NULL_NODE && right != NULL_NODE) {
@@ -370,7 +370,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 	 * 
 	 * @author zhangq2. Created Mar 26, 2015.
 	 */
-	class NullBinaryNode extends BinaryNode {
+	class NullBinaryNode extends Node {
 
 		public NullBinaryNode() {
 			super(null);
@@ -400,9 +400,9 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		}
 
 		@Override
-		public BinaryNode insert(T item, Boolean b) {
+		public Node insert(T item, Boolean b) {
 			b.set(true);
-			return new BinaryNode(item);
+			return new Node(item);
 		}
 
 		@Override
@@ -411,7 +411,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		}
 
 		@Override
-		public BinaryNode remove(T item, Boolean b) {
+		public Node remove(T item, Boolean b) {
 			return this;
 		}
 	}
@@ -421,12 +421,12 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 	}
 
 	private class PreOrderIterator implements Iterator<T> {
-		private Stack<BinaryNode> stack;
-		private BinaryNode current;
+		private Stack<Node> stack;
+		private Node current;
 		private int version;
 
 		public PreOrderIterator() {
-			stack = new Stack<BinaryNode>();
+			stack = new Stack<Node>();
 			version = treeVersion;
 			current = NULL_NODE;
 			if (root != NULL_NODE)
@@ -468,18 +468,18 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 	}
 
 	private class InOrderIterator implements Iterator<T> {
-		private Stack<BinaryNode> stack;
+		private Stack<Node> stack;
 		private int version;
-		private BinaryNode current;
+		private Node current;
 		
 		public InOrderIterator() {
 			version = treeVersion;
-			stack = new Stack<BinarySearchTree<T>.BinaryNode>();
+			stack = new Stack<BinarySearchTree<T>.Node>();
 			current = NULL_NODE;
 			advance(root);
 		}
 
-		private void advance(BinaryNode node) {
+		private void advance(Node node) {
 			while (node != NULL_NODE) {
 				stack.push(node);
 				node = node.getLeft();
@@ -499,7 +499,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 			if (treeVersion != version)
 				throw new ConcurrentModificationException();
 			current = stack.pop();
-			BinaryNode next = current.getRight();
+			Node next = current.getRight();
 			while (next != NULL_NODE) {
 				stack.push(next);
 				next = next.getLeft();
@@ -523,13 +523,13 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 	}
 
 	private class postOrderIterator implements Iterator<T> {
-		private Stack<BinaryNode> stack;
+		private Stack<Node> stack;
 		private int version;
-		private BinaryNode current;
+		private Node current;
 
 		public postOrderIterator() {
 			version = treeVersion;
-			stack = new Stack<BinarySearchTree<T>.BinaryNode>();
+			stack = new Stack<BinarySearchTree<T>.Node>();
 			current = root;
 			while (current != NULL_NODE) {
 				while (current != NULL_NODE) {
@@ -552,7 +552,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 			}
 			if (treeVersion != version)
 				throw new ConcurrentModificationException();
-			BinaryNode next = stack.peek().getRight();
+			Node next = stack.peek().getRight();
 			if (next != current || current == NULL_NODE) {
 				while (next != NULL_NODE) {
 					while (next != NULL_NODE) {
@@ -582,10 +582,10 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 	}
 
 	class MysteryIterator implements Iterator<T> {
-		LinkedList<BinaryNode> quene;
+		LinkedList<Node> quene;
 
 		public MysteryIterator() {
-			quene = new LinkedList<BinaryNode>();
+			quene = new LinkedList<Node>();
 			quene.offer(root);
 		}
 
@@ -598,7 +598,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		public T next() {
 			if (!hasNext())
 				throw new NoSuchElementException();
-			BinaryNode next = quene.poll();
+			Node next = quene.poll();
 			if (next.left != NULL_NODE)
 				quene.offer(next.left);
 			if (next.right != NULL_NODE)

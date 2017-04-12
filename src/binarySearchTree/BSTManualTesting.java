@@ -23,7 +23,7 @@ public class BSTManualTesting {
 		BinarySearchTree<Integer> b = new BinarySearchTree<Integer>();
 		assertTrue(b.isEmpty());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
+		BinarySearchTree.Node n1 = b.new Node(1);
 		b.setRoot(n1);
 		assertFalse(b.isEmpty());
 	}
@@ -33,27 +33,27 @@ public class BSTManualTesting {
 		BinarySearchTree<Integer> b = new BinarySearchTree<Integer>();
 		assertEquals(0, b.size());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
+		BinarySearchTree.Node n1 = b.new Node(1);
 		b.setRoot(n1);
 		assertEquals(1, b.size());
 		
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
 		n1.setRight(n2);
 		assertEquals(2, b.size());
 		
 		n2.setRight(n3);
 		assertEquals(3, b.size());
 
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
+		BinarySearchTree.Node n4 = b.new Node(4);
 		n1.setLeft(n4);
 		assertEquals(4, b.size());
 
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
+		BinarySearchTree.Node n5 = b.new Node(5);
 		n4.setLeft(n5);
 		assertEquals(5, b.size());
 
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		n5.setRight(n6);
 		assertEquals(6, b.size());
 	}
@@ -63,27 +63,27 @@ public class BSTManualTesting {
 		BinarySearchTree<Integer> b = new BinarySearchTree<Integer>();
 		assertEquals(-1, b.height());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
+		BinarySearchTree.Node n1 = b.new Node(1);
 		b.setRoot(n1);
 		assertEquals(0, b.height());
 		
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
 		n1.setRight(n2);
 		assertEquals(1, b.height());
 		
 		n2.setRight(n3);
 		assertEquals(2, b.height());
 
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
+		BinarySearchTree.Node n4 = b.new Node(4);
 		n1.setLeft(n4);
 		assertEquals(2, b.height());
 
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
+		BinarySearchTree.Node n5 = b.new Node(5);
 		n4.setLeft(n5);
 		assertEquals(2, b.height());
 
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		n5.setRight(n6);
 		assertEquals(3, b.height());
 	}
@@ -92,17 +92,17 @@ public class BSTManualTesting {
 	@Test
 	public void testContainsNonBST(){
 		BinarySearchTree<Integer> b = new BinarySearchTree<Integer>();
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
+		BinarySearchTree.Node n1 = b.new Node(1);
 		b.setRoot(n1);
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
 		n1.setRight(n2);
 		n2.setRight(n3);
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
+		BinarySearchTree.Node n4 = b.new Node(4);
 		n1.setLeft(n4);
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
+		BinarySearchTree.Node n5 = b.new Node(5);
 		n4.setLeft(n5);
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		n5.setRight(n6);
 		assertEquals(6, b.size());
 		assertTrue(b.containsNonBST(1));
@@ -120,12 +120,12 @@ public class BSTManualTesting {
 		BinarySearchTree<Integer> b = new BinarySearchTree<Integer>();
 		System.out.println("Empty tree: " + b.toString());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n1 = b.new Node(1);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
+		BinarySearchTree.Node n4 = b.new Node(4);
+		BinarySearchTree.Node n5 = b.new Node(5);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		b.setRoot(n1);
 		n1.setRight(n2);
 		n2.setRight(n3);
@@ -140,12 +140,12 @@ public class BSTManualTesting {
 		BinarySearchTree<Integer> b = new BinarySearchTree<Integer>();
 		assertEquals("[]", b.toString());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n1 = b.new Node(1);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
+		BinarySearchTree.Node n4 = b.new Node(4);
+		BinarySearchTree.Node n5 = b.new Node(5);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		b.setRoot(n1);
 		n1.setRight(n2);
 		n2.setRight(n3);
@@ -161,12 +161,12 @@ public class BSTManualTesting {
 		BinarySearchTree<Integer> b = new BinarySearchTree<Integer>();
 		assertEquals(new ArrayList<Integer>(), b.toArrayList());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n1 = b.new Node(1);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
+		BinarySearchTree.Node n4 = b.new Node(4);
+		BinarySearchTree.Node n5 = b.new Node(5);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		b.setRoot(n1);
 		n1.setRight(n2);
 		n2.setRight(n3);
@@ -185,12 +185,12 @@ public class BSTManualTesting {
 		BinarySearchTree<Integer> b = new BinarySearchTree<Integer>();
 		assertEquals(0, b.toArray().length);
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n1 = b.new Node(1);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
+		BinarySearchTree.Node n4 = b.new Node(4);
+		BinarySearchTree.Node n5 = b.new Node(5);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		b.setRoot(n1);
 		n1.setRight(n2);
 		n2.setRight(n3);
@@ -209,12 +209,12 @@ public class BSTManualTesting {
 		Iterator iter = b.inefficientIterator();
 		assertFalse(iter.hasNext());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n1 = b.new Node(1);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
+		BinarySearchTree.Node n4 = b.new Node(4);
+		BinarySearchTree.Node n5 = b.new Node(5);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		b.setRoot(n1);
 		n1.setRight(n2);
 		n2.setRight(n3);
@@ -247,12 +247,12 @@ public class BSTManualTesting {
 		Iterator iter = b.preOrderIterator();
 		assertFalse(iter.hasNext());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n1 = b.new Node(1);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
+		BinarySearchTree.Node n4 = b.new Node(4);
+		BinarySearchTree.Node n5 = b.new Node(5);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		b.setRoot(n1);
 		n1.setRight(n2);
 		n2.setRight(n3);
@@ -285,12 +285,12 @@ public class BSTManualTesting {
 		Iterator iter = b.postOrderIterator();
 		assertFalse(iter.hasNext());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n1 = b.new Node(1);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
+		BinarySearchTree.Node n4 = b.new Node(4);
+		BinarySearchTree.Node n5 = b.new Node(5);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		b.setRoot(n1);
 		n1.setRight(n2);
 		n2.setRight(n3);
@@ -324,12 +324,12 @@ public class BSTManualTesting {
 		Iterator iter = b.iterator();
 		assertFalse(iter.hasNext());
 		
-		BinarySearchTree.BinaryNode n1 = b.new BinaryNode(1);
-		BinarySearchTree.BinaryNode n2 = b.new BinaryNode(2);
-		BinarySearchTree.BinaryNode n3 = b.new BinaryNode(3);
-		BinarySearchTree.BinaryNode n4 = b.new BinaryNode(4);
-		BinarySearchTree.BinaryNode n5 = b.new BinaryNode(5);
-		BinarySearchTree.BinaryNode n6 = b.new BinaryNode(6);
+		BinarySearchTree.Node n1 = b.new Node(1);
+		BinarySearchTree.Node n2 = b.new Node(2);
+		BinarySearchTree.Node n3 = b.new Node(3);
+		BinarySearchTree.Node n4 = b.new Node(4);
+		BinarySearchTree.Node n5 = b.new Node(5);
+		BinarySearchTree.Node n6 = b.new Node(6);
 		b.setRoot(n1);
 		n1.setRight(n2);
 		n2.setRight(n3);
