@@ -13,7 +13,7 @@ public class EditTree {
 	private Node root;
 	private int totalRotationCount;
 	private int height;
-	
+
 	/**
 	 * Construct an empty tree
 	 */
@@ -109,7 +109,7 @@ public class EditTree {
 	public Node getRoot() {
 		return root;
 	}
-	
+
 	/**
 	 * return the string produced by an inorder traversal of this tree
 	 */
@@ -315,7 +315,6 @@ public class EditTree {
 		if (height >= heightOther) {
 			// this tree is higher than the other tree
 			if (heightOther == -1) {
-				return;
 			} else if (heightOther == 0) {
 				root = root.add(other.root.getElement(), size(), a);
 			} else {
@@ -330,8 +329,6 @@ public class EditTree {
 			// this tree is lower than the other tree
 			if (height == -1) {
 				root = other.root;
-				other.root = Node.NULL_NODE;
-				return;
 			} else if (height == 0) {
 				root = other.root.add(root.getElement(), 0, a);
 			} else {
@@ -344,9 +341,9 @@ public class EditTree {
 			}
 		}
 		totalRotationCount += a.rotate + other.totalRotationCount;
-		height = root.height();
+		this.height = this.root.height();
 		other.root = Node.NULL_NODE;
-		other.height = 0;
+		other.height = -1;
 		check();
 	}
 
@@ -379,7 +376,7 @@ public class EditTree {
 	public static class NodeWrapper {
 		public Node root;
 	}
-	
+
 	/**
 	 * 
 	 * Helper class that helps us keep track of the status of various method
@@ -434,8 +431,12 @@ public class EditTree {
 	 * 
 	 */
 	public void check() {
-		if (size() < 1000)
-			root.check(new X());
+		if (size() < 1000) {
+			X x = new X();
+			root.check(x);
+			if (height != x.height)
+				throw new RuntimeException("Height in Editor tree is not updated: " + height + " " + x.height);
+		}
 	}
 
 	public static class X {
