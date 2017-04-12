@@ -76,8 +76,7 @@ public class EditTree implements CharSequence {
 	private int balancedHeightFromSize(int length) {
 		if (length == 0)
 			return -1;
-		int hl = (int) (Math.log(length) / Math.log(2));
-		return hl;
+		return (int) (Math.log(length) / Math.log(2));
 	}
 
 	/**
