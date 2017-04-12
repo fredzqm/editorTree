@@ -51,6 +51,20 @@ public class Node {
 				throw new RuntimeException();
 			}
 		}
+
+		public static Code getCode(int hdiff) {
+			switch (hdiff) {
+			case 0:
+				return Code.SAME;
+			case 1:
+				return Code.RIGHT;
+			case -1:
+				return Code.LEFT;
+			default:
+				throw new RuntimeException();
+			}
+		}
+
 	}
 
 	private char element;

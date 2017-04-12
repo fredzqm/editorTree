@@ -41,7 +41,7 @@ public class EditTree {
 	 */
 	public EditTree(String s) {
 		root = constructFromString(s, 0, s.length());
-		height = root.height();
+		height = balancedHeightFromSize(s.length());
 		check();
 	}
 
@@ -61,18 +61,17 @@ public class EditTree {
 		if (start == end)
 			return Node.NULL_NODE;
 		int mid = (start + end) / 2;
-		Code b;
-		int hl = (int) (Math.log(mid - start) / Math.log(2));
-		int hr = (int) (Math.log(end - mid - 1) / Math.log(2));
-		if (hl == hr) {
-			b = Code.SAME;
-		} else if (hl < hr) {
-			b = Code.RIGHT;
-		} else {
-			b = Code.LEFT;
-		}
+		int hl = balancedHeightFromSize(mid - start);
+		int hr = balancedHeightFromSize(end - mid - 1);
 		return new Node(string.charAt(mid), constructFromString(string, start, mid),
-				constructFromString(string, mid + 1, end), b);
+				constructFromString(string, mid + 1, end), Code.getCode(hr - hl));
+	}
+
+	private int balancedHeightFromSize(int length) {
+		if (length == 0)
+			return -1;
+		int hl = (int) (Math.log(length) / Math.log(2));
+		return hl;
 	}
 
 	/**
