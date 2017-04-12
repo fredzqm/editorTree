@@ -284,28 +284,23 @@ public class Node {
 		size++;
 		if (pos <= getRank()) {
 			left = left.add(c, pos, a);
-			if (a.treeBalanced)
-				return this;
-			if (getBalance() == Code.SAME) {
-				return updateBalanceCode(null, Code.LEFT, null);
-			} else if (getBalance() != Code.LEFT) {
-				a.treeBalanced = true;
-				return updateBalanceCode(null, Code.SAME, null);
-			} else {
-				return addRotateFromLeft(a);
-			}
+			return addFromLeft(a);
 		} else {
 			right = right.add(c, pos - getRank() - 1, a);
-			if (a.treeBalanced)
-				return this;
-			if (getBalance() == Code.SAME) {
-				return updateBalanceCode(null, Code.RIGHT, null);
-			} else if (getBalance() != Code.RIGHT) {
-				a.treeBalanced = true;
-				return updateBalanceCode(null, Code.SAME, null);
-			} else {
-				return addRotateFromRight(a);
-			}
+			return addFromRight(a);
+		}
+	}
+
+	private Node addFromLeft(H a) {
+		if (a.treeBalanced)
+			return this;
+		if (getBalance() == Code.SAME) {
+			return updateBalanceCode(null, Code.LEFT, null);
+		} else if (getBalance() != Code.LEFT) {
+			a.treeBalanced = true;
+			return updateBalanceCode(null, Code.SAME, null);
+		} else {
+			return addRotateFromLeft(a);
 		}
 	}
 
@@ -538,6 +533,10 @@ public class Node {
 			else
 				right = right.concatRight(a, inserted, heightDiff - 1);
 		}
+		return addFromRight(a);
+	}
+
+	private Node addFromRight(H a) {
 		if (a.treeBalanced)
 			return this;
 		if (getBalance() == Code.SAME) {
@@ -582,16 +581,7 @@ public class Node {
 			else
 				left = left.concatLeft(a, inserted, heightDiff - 1);
 		}
-		if (a.treeBalanced)
-			return this;
-		if (getBalance() == Code.SAME) {
-			return updateBalanceCode(null, Code.LEFT, null);
-		} else if (getBalance() == Code.RIGHT) {
-			a.treeBalanced = true;
-			return updateBalanceCode(null, Code.SAME, null);
-		} else {
-			return addRotateFromLeft(a);
-		}
+		return addFromLeft(a);
 	}
 
 	/**
