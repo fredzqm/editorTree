@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import editortrees.EditTree.H;
-import editortrees.EditTree.NodeWrapper;
+import editortrees.EditTree.SH;
 import editortrees.EditTree.X;
 
 /**
@@ -157,14 +157,6 @@ public class Node {
 		return right;
 	}
 
-	public int height() {
-		if (this == NULL_NODE)
-			return -1;
-		if (getBalance() == Code.RIGHT)
-			return left.height() + 2;
-		return left.height() + 1;
-	}
-
 	public int size() {
 		return size;
 	}
@@ -304,6 +296,19 @@ public class Node {
 		}
 	}
 
+	private Node addFromRight(H a) {
+		if (a.treeBalanced)
+			return this;
+		if (getBalance() == Code.SAME) {
+			return updateBalanceCode(null, Code.RIGHT, null);
+		} else if (getBalance() == Code.LEFT) {
+			a.treeBalanced = true;
+			return updateBalanceCode(null, Code.SAME, null);
+		} else {
+			return addRotateFromRight(a);
+		}
+	}
+
 	/**
 	 * 
 	 * Do the rotation during the add process if the add process causes the
@@ -428,8 +433,6 @@ public class Node {
 		size--;
 		if (pos < getRank()) {
 			left = left.delete(pos, a);
-			if (a.treeBalanced)
-				return this;
 			return deleteFromLeft(a);
 		} else {
 			if (getRank() < pos) {
@@ -448,8 +451,6 @@ public class Node {
 				this.element = a.deleted;
 				a.deleted = swap;
 			}
-			if (a.treeBalanced)
-				return this;
 			return deleteFromRight(a);
 		}
 	}
@@ -463,6 +464,8 @@ public class Node {
 	 * @return updated subtree root node
 	 */
 	private Node deleteFromLeft(H a) {
+		if (a.treeBalanced)
+			return this;
 		if (getBalance() == Code.SAME) {
 			a.treeBalanced = true;
 			return updateBalanceCode(null, Code.RIGHT, null);
@@ -489,6 +492,8 @@ public class Node {
 	 * @return updated subtree root node
 	 */
 	private Node deleteFromRight(H a) {
+		if (a.treeBalanced)
+			return this;
 		if (getBalance() == Code.SAME) {
 			a.treeBalanced = true;
 			return updateBalanceCode(null, Code.LEFT, null);
@@ -536,19 +541,6 @@ public class Node {
 		return addFromRight(a);
 	}
 
-	private Node addFromRight(H a) {
-		if (a.treeBalanced)
-			return this;
-		if (getBalance() == Code.SAME) {
-			return updateBalanceCode(null, Code.RIGHT, null);
-		} else if (getBalance() == Code.LEFT) {
-			a.treeBalanced = true;
-			return updateBalanceCode(null, Code.SAME, null);
-		} else {
-			return addRotateFromRight(a);
-		}
-	}
-
 	/**
 	 * Concatenate this subtree and another smaller subtree with the glue
 	 * element in a.glue on the left side, given the difference between those
@@ -589,89 +581,52 @@ public class Node {
 	 * tree other
 	 * 
 	 * @param pos
-	 *            position to split
-	 * @param a
-	 *            first helper class
-	 * @param spl
-	 *            right subtree to be concatenate
-	 * @param b
-	 *            second helper class
-	 * @return root node of the left spliced tree
+	 * @param height the current height of this tree
+	 * @param sh the helper dummy helper object to store the returned data
 	 */
-	public void split(int pos, H a, NodeWrapper spl, H b) {
+	public void split(int pos, int height, SH sh) {
 		if (this == NULL_NODE)
 			throw new RuntimeException();
+		int leftHeight = getBalance() == Code.RIGHT ? height - 2 : height - 1;
+		int rightHeight = getBalance() == Code.LEFT ? height - 2 : height - 1;
 		if (pos == getRank() || pos == getRank() + 1) {
 			// basis case when we can cut this subtree besides the node
-			spl.leftRoot = left;
-			spl.rightRoot = right;
+			sh.leftRoot = left;
+			sh.leftHeight = leftHeight;
+			sh.rightRoot = right;
+			sh.rightHeight = rightHeight;
 			if (pos == getRank()) {
-				spl.rightRoot = spl.rightRoot.add(getElement(), 0, b);
-				updateHdiff(b);
+				sh.rightRoot = sh.rightRoot.add(getElement(), 0, sh);
+				if (!sh.isBalancedAndRest())
+					sh.rightHeight++;
 			} else {
-				spl.leftRoot = spl.leftRoot.add(getElement(), spl.leftRoot.size(), a);
-				updateHdiff(a);
+				sh.leftRoot = sh.leftRoot.add(getElement(), sh.leftRoot.size(), sh);
+				if (!sh.isBalancedAndRest())
+					sh.leftHeight++;
 			}
-			synHdiff(a, b);
 		} else if (pos < getRank()) {
-			left.split(pos, a, spl, b);
-			b.hdiff += getBalance().hdiff();
-			b.deleted = getElement();
-			if (b.hdiff >= 0) {
-				spl.rightRoot = right.concatLeft(b, spl.rightRoot, b.hdiff);
-				updateHdiff(b);
+			left.split(pos, leftHeight, sh);
+			sh.deleted = getElement();
+			if (rightHeight >= sh.rightHeight) {
+				sh.rightRoot = right.concatLeft(sh, sh.rightRoot, rightHeight - sh.rightHeight);
+				sh.rightHeight = rightHeight;
 			} else {
-				spl.rightRoot = spl.rightRoot.concatRight(b, right, -b.hdiff);
-				updateHdiff(b);
-				b.hdiff--;
+				sh.rightRoot = sh.rightRoot.concatRight(sh, right, sh.rightHeight - rightHeight);
 			}
-			a.hdiff++;
-			synHdiff(a, b);
+			if (!sh.isBalancedAndRest())
+				sh.rightHeight++;
 		} else {
-			right.split(pos - getRank() - 1, a, spl, b);
-			a.hdiff -= getBalance().hdiff();
-			a.deleted = getElement();
-			if (a.hdiff >= 0) {
-				spl.leftRoot = left.concatRight(a, spl.leftRoot, a.hdiff);
-				updateHdiff(a);
+			right.split(pos - getRank() - 1, rightHeight, sh);
+			sh.deleted = getElement();
+			if (leftHeight >= sh.leftHeight) {
+				sh.leftRoot = left.concatRight(sh, sh.leftRoot, leftHeight - sh.leftHeight);
+				sh.leftHeight  = leftHeight;
 			} else {
-				spl.leftRoot = spl.leftRoot.concatLeft(a, left, -a.hdiff);
-				updateHdiff(a);
-				a.hdiff--;
+				sh.leftRoot = sh.leftRoot.concatLeft(sh, left, sh.leftHeight - leftHeight);
 			}
-			b.hdiff++;
-			synHdiff(a, b);
+			if (!sh.isBalancedAndRest())
+				sh.leftHeight++;
 		}
-	}
-
-	/**
-	 * 
-	 * update the frame of referece of left and right hdiff to their parant node
-	 *
-	 * @param a
-	 *            helper class for left tree
-	 * @param b
-	 *            helper class for right tree
-	 */
-	private void synHdiff(H a, H b) {
-		if (getBalance() == Code.LEFT)
-			b.hdiff++;
-		else if (getBalance() == Code.RIGHT)
-			a.hdiff++;
-	}
-
-	/**
-	 * update the hdiff of this subtree after merging according to a.edited, and
-	 * then set a.edited to false
-	 *
-	 * @param a
-	 */
-	private static void updateHdiff(H a) {
-		if (a.treeBalanced)
-			a.hdiff = 1;
-		else
-			a.hdiff = 0;
-		a.treeBalanced = false;
 	}
 
 	/**

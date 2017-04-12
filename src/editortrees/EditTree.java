@@ -86,11 +86,6 @@ public class EditTree {
 		check();
 	}
 
-	public EditTree(Node root, int height) {
-		this.root = root;
-		this.height = height;
-	}
-
 	/**
 	 * 
 	 * returns the total number of rotations done in this tree since it was
@@ -319,9 +314,7 @@ public class EditTree {
 				this.add(other.root.getElement());
 			} else {
 				other.root = other.root.delete(0, a);
-				if (a.treeBalanced)
-					a.treeBalanced = false;
-				else
+				if (!a.isBalancedAndRest())
 					heightOther--;
 				root = root.concatRight(a, other.root, heightThis - heightOther);
 				if (!a.treeBalanced)
@@ -338,9 +331,7 @@ public class EditTree {
 				this.height = other.height;
 			} else {
 				this.root = root.delete(size() - 1, a);
-				if (a.treeBalanced)
-					a.treeBalanced = false;
-				else
+				if (!a.isBalancedAndRest())
 					heightThis--;
 				this.root = other.root.concatLeft(a, root, heightOther - heightThis);
 				this.height = other.height;
@@ -368,20 +359,40 @@ public class EditTree {
 	public EditTree split(int pos) throws IndexOutOfBoundsException {
 		if (pos < 0 || pos >= size())
 			throw new IndexOutOfBoundsException();
-		NodeWrapper spl = new NodeWrapper();
-		H a = new H(), b = new H();
-		root.split(pos, a, spl, b);
-		this.root = spl.leftRoot;
-		this.height = spl.leftRoot.height();
+		SH result = new SH();
+		root.split(pos, height, result);
+		// left tree
+		this.root = result.leftRoot;
+		this.height = result.leftHeight;
 		check();
-		EditTree editTree = new EditTree(spl.rightRoot, spl.rightRoot.height());
+		// right tree
+		EditTree editTree = new EditTree();
+		editTree.root = result.rightRoot;
+		editTree.height = result.rightHeight;
 		editTree.check();
-		totalRotationCount += a.rotate + b.rotate;
+
+		totalRotationCount += result.rotate;
 		return editTree;
 	}
 
-	public static class NodeWrapper {
+	/**
+	 * Another helper class for split, it stores the left and right tree splited
+	 * and their height, so we can easily concanete it with another node
+	 * 
+	 * @author zhang
+	 *
+	 */
+	public static class SH extends H {
+		
+		/**
+		 * The result of the splited tree
+		 */
 		public Node leftRoot, rightRoot;
+		
+		/**
+		 * the height of those two splited tree
+		 */
+		public int leftHeight, rightHeight;
 	}
 
 	/**
@@ -412,17 +423,12 @@ public class EditTree {
 		 */
 		public int rotate;
 
-		/**
-		 * store the height differernce compared to a certain subtree in split
-		 * method
-		 */
-		public int hdiff;
-
-		public H() {
-			treeBalanced = false;
-			deleted = '\n';
-			rotate = 0;
-			hdiff = 1;
+		public boolean isBalancedAndRest() {
+			if (treeBalanced) {
+				treeBalanced = false;
+				return true;
+			}
+			return false;
 		}
 	}
 
