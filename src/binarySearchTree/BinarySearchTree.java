@@ -471,10 +471,10 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 		private Stack<Node> stack;
 		private int version;
 		private Node current;
-		
+
 		public InOrderIterator() {
 			version = treeVersion;
-			stack = new Stack<BinarySearchTree<T>.Node>();
+			stack = new Stack<Node>();
 			current = NULL_NODE;
 			advance(root);
 		}
@@ -499,11 +499,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 			if (treeVersion != version)
 				throw new ConcurrentModificationException();
 			current = stack.pop();
-			Node next = current.getRight();
-			while (next != NULL_NODE) {
-				stack.push(next);
-				next = next.getLeft();
-			}
+			advance(current.getRight());
 			return current.getData();
 		}
 
@@ -529,14 +525,18 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 
 		public postOrderIterator() {
 			version = treeVersion;
-			stack = new Stack<BinarySearchTree<T>.Node>();
-			current = root;
-			while (current != NULL_NODE) {
-				while (current != NULL_NODE) {
-					stack.push(current);
-					current = current.getLeft();
+			stack = new Stack<Node>();
+			current = NULL_NODE;
+			advance(root);
+		}
+
+		private void advance(Node next) {
+			while (next != NULL_NODE) {
+				while (next != NULL_NODE) {
+					stack.push(next);
+					next = next.getLeft();
 				}
-				current = stack.peek().getRight();
+				next = stack.peek().getRight();
 			}
 		}
 
@@ -553,14 +553,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Iterable<T> {
 			if (treeVersion != version)
 				throw new ConcurrentModificationException();
 			Node next = stack.peek().getRight();
-			if (next != current || current == NULL_NODE) {
-				while (next != NULL_NODE) {
-					while (next != NULL_NODE) {
-						stack.push(next);
-						next = next.getLeft();
-					}
-					next = stack.peek().getRight();
-				}
+			if (next != NULL_NODE && next != current) {
+				advance(next);
 			}
 			current = stack.pop();
 			return current.getData();
