@@ -1,5 +1,6 @@
 package editortrees;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -8,12 +9,16 @@ import java.util.Stack;
 import debughelp.DisplayableBinaryTree;
 import editortrees.Node.Code;
 
-// A height-balanced binary tree with rank that could be the basis for a text editor.
-
+/**
+ * 
+ * @author zhang
+ *
+ */
 public class EditTree {
 	private Node root;
 	private int totalRotationCount;
 	private int height;
+	private int treeVersion;
 
 	/**
 	 * Construct an empty tree
@@ -249,6 +254,7 @@ public class EditTree {
 		totalRotationCount += a.rotate;
 		if (!a.treeBalanced)
 			height++;
+		treeVersion++;
 		check();
 	}
 
@@ -268,6 +274,7 @@ public class EditTree {
 		totalRotationCount += a.rotate;
 		if (!a.treeBalanced)
 			height--;
+		treeVersion++;
 		check();
 		return a.deleted;
 	}
@@ -348,6 +355,7 @@ public class EditTree {
 		totalRotationCount += a.rotate + other.totalRotationCount;
 		other.root = Node.NULL_NODE;
 		other.height = -1;
+		treeVersion++;
 		check();
 	}
 
@@ -370,6 +378,7 @@ public class EditTree {
 		// left tree
 		this.root = result.leftRoot;
 		this.height = result.leftHeight;
+		treeVersion++;
 		check();
 		// right tree
 		EditTree editTree = new EditTree();
@@ -471,9 +480,11 @@ public class EditTree {
 
 	class InOrderIterator implements Iterator<Character> {
 		private Stack<Node> stack;
-
+		int version;
+		
 		public InOrderIterator() {
 			stack = new Stack<Node>();
+			version = treeVersion;
 			advance(root);
 		}
 
@@ -494,6 +505,8 @@ public class EditTree {
 			if (!hasNext()) {
 				throw new NoSuchElementException();
 			}
+			if (treeVersion != version)
+				throw new ConcurrentModificationException();
 			Node current = stack.pop();
 			advance(current.getRight());
 			return current.getElement();
